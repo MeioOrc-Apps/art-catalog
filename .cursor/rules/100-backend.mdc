@@ -1,0 +1,9 @@
+---
+description: Convenções do backend (FastAPI / domínio de arte)
+globs: backend/**
+---
+
+As convenções do backend estão em `docs/conventions/backend.md` (fonte canônica,
+lida também por Claude Code, Copilot, Codex e demais agentes via `AGENTS.md`).
+
+@../../docs/conventions/backend.md

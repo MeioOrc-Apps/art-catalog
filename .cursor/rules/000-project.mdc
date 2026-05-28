@@ -1,0 +1,9 @@
+---
+description: Contexto e princípios do projeto Atelier (catálogo de referências artísticas)
+alwaysApply: true
+---
+
+As convenções gerais do projeto estão em `docs/conventions/project.md` (fonte canônica,
+lida também por Claude Code, Copilot, Codex e demais agentes via `AGENTS.md`).
+
+@../../docs/conventions/project.md

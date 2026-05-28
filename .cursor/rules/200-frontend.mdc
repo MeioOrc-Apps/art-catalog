@@ -1,0 +1,9 @@
+---
+description: Convenções do frontend (React / galeria art-first)
+globs: frontend/**
+---
+
+As convenções do frontend estão em `docs/conventions/frontend.md` (fonte canônica,
+lida também por Claude Code, Copilot, Codex e demais agentes via `AGENTS.md`).
+
+@../../docs/conventions/frontend.md
