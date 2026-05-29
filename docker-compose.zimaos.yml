@@ -1,8 +1,15 @@
 name: art-catalog
+
+networks:
+  art-network:
+    driver: bridge
+
 services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
+    networks:
+      - art-network
     environment:
       POSTGRES_DB: art
       POSTGRES_USER: art
@@ -18,6 +25,8 @@ services:
   api:
     image: ghcr.io/sergiosjs/art-catalog-api:latest
     restart: unless-stopped
+    networks:
+      - art-network
     depends_on:
       db:
         condition: service_healthy
@@ -41,6 +50,10 @@ services:
   frontend:
     image: ghcr.io/sergiosjs/art-catalog-frontend:latest
     restart: unless-stopped
+    networks:
+      - art-network
+    depends_on:
+      - api
     ports:
       - "5173:80"
 
