@@ -77,6 +77,30 @@ docker compose down
 docker compose down -v
 ```
 
+### 5. Rodando os Testes
+
+O projeto possui suítes de testes automatizados tanto para o backend quanto para o frontend.
+
+**Backend (Python / Pytest):**
+```bash
+cd backend
+# Roda todos os testes
+uv run pytest
+# Roda os testes exibindo o relatório de cobertura de código
+uv run pytest --cov=src
+```
+
+**Frontend (React / Vitest):**
+```bash
+cd frontend
+# Roda todos os testes (modo interativo)
+npm test
+# Roda os testes com interface gráfica no navegador
+npm run test:ui
+# Roda os testes exibindo o relatório de cobertura de código
+npm run coverage
+```
+
 ---
 
 ## 🚀 Implantação no ZimaOS / CasaOS
