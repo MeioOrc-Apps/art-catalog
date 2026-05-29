@@ -1,7 +1,7 @@
 # Art Catalog
 
 <div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/gallery.png" alt="Art Catalog Icon" width="120" />
+  <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/photoprism.png" alt="Art Catalog Icon" width="120" />
   <p><em>Catálogo pessoal de referências artísticas e moodboard.</em></p>
 </div>
 

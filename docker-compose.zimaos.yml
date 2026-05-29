@@ -47,7 +47,7 @@ services:
 x-casaos:
   author: sergio.sousa
   category: Media
-  icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/gallery.png
+  icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/photoprism.png
   title:
     custom: Art Catalog
     en_us: Art Catalog
