@@ -61,11 +61,11 @@ class Settings(BaseSettings):
 
     RATE_LIMITS_DISABLED: bool = False
 
-    CORS_ORIGINS: list[str] | str | None = None
+    CORS_ORIGINS: list[str] | None = None
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
-    def assemble_cors_origins(cls, v: str | list[str]) -> list[str] | str:
+    def assemble_cors_origins(cls, v: str | list[str]) -> list[str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
         elif isinstance(v, str) and v.startswith("["):
