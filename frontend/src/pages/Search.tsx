@@ -22,8 +22,8 @@ import {
 import Gallery from '@/components/Gallery'
 import Lightbox from '@/components/Lightbox'
 import Skeleton from '@/components/Skeleton'
-import type { Artwork } from '@/types/artwork'
-import { SearchIcon, RefreshCw, Upload, AlertCircle, LogOut, X, Plus, Bookmark, FolderOpen, ShieldAlert, ArrowLeft, Compass } from 'lucide-react'
+import type { Artwork, ArtistSummary, ArtistPaginated } from '@/types/artwork'
+import { SearchIcon, RefreshCw, Upload, AlertCircle, LogOut, Plus, Bookmark, FolderOpen, ShieldAlert, ArrowLeft, Compass } from 'lucide-react'
 import { useLogout } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/authStore'
 import { Link } from 'react-router-dom'
@@ -362,9 +362,9 @@ export default function SearchPage() {
     setPendingSearch(null)
   }, [pendingSearch, searchMutation])
 
-  const chartChips = artistsList.map((a) => ({
-    slug: a.slug, canonical_name: a.canonical_name, artwork_count: a.artworks?.length || 0, sync_status: a.sync_status
-  }))
+  // const chartChips = artistsList.map((a) => ({
+  //   slug: a.slug, canonical_name: a.canonical_name, artwork_count: a.artworks?.length || 0, sync_status: a.sync_status
+  // }))
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col">
@@ -387,12 +387,12 @@ export default function SearchPage() {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Buscar artista…"
                   className="w-full h-10 pl-8 pr-3 text-base rounded-sm border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
-                  disabled={isProcessing}
+                  disabled={isProcessing || false}
                 />
               </div>
               <button
                 type="submit"
-                disabled={!query.trim() || isProcessing}
+                disabled={!query.trim() || isProcessing || false}
                 className="shrink-0 h-10 px-3 flex items-center justify-center rounded-sm bg-accent text-primary-foreground hover:brightness-110 active:translate-y-px disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 aria-label="Buscar"
               >
@@ -422,12 +422,12 @@ export default function SearchPage() {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Buscar artista…"
                   className="w-full h-10 pl-8 pr-3 text-base rounded-sm border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
-                  disabled={isProcessing}
+                  disabled={isProcessing || false}
                 />
               </div>
               <button
                 type="submit"
-                disabled={!query.trim() || isProcessing}
+                disabled={!query.trim() || isProcessing || false}
                 className="shrink-0 h-10 px-3 flex items-center justify-center rounded-sm bg-accent text-primary-foreground hover:brightness-110 active:translate-y-px disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 aria-label="Buscar"
               >
@@ -591,7 +591,7 @@ export default function SearchPage() {
                   <Upload size={14} />
                   {uploadMutation.isPending ? 'Enviando...' : 'Upload'}
                 </button>
-                <button type="button" className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-base text-foreground hover:text-accent hover:bg-card transition-colors" onClick={handleRefresh} disabled={isProcessing}>
+                <button type="button" className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-base text-foreground hover:text-accent hover:bg-card transition-colors" onClick={handleRefresh} disabled={isProcessing || false}>
                   <RefreshCw size={14} />
                   Atualizar
                 </button>

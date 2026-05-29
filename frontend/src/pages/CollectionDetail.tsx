@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, LayoutGrid, Maximize, Bookmark, Plus, Compass, FolderOpen, ShieldAlert, LogOut } from 'lucide-react'
-import { listCollections, addToCollection, removeFromCollection, createCollection, togglePinArtwork, deleteArtwork } from '@/api/artworks'
+import { listCollections, addToCollection, removeFromCollection, createCollection } from '@/api/artworks'
 import Gallery from '@/components/Gallery'
 import Lightbox from '@/components/Lightbox'
 import Moodboard from '@/components/Moodboard'

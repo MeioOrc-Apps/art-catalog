@@ -16,6 +16,7 @@ const mockArtwork = (overrides: Partial<Artwork> = {}): Artwork => ({
   dominant_colors: null,
   phash: 'abc123',
   is_downloaded: true,
+  is_pinned: false,
   created_at: '2024-01-01T00:00:00Z',
   ...overrides,
 })
@@ -100,6 +101,7 @@ describe('Lightbox', () => {
         artworks={[mockArtwork()]}
         index={0}
         onClose={onClose}
+        onNavigate={() => {}}
       />
     )
     fireEvent.click(screen.getByLabelText('Fechar'))
@@ -114,6 +116,7 @@ describe('Lightbox', () => {
         artworks={[mockArtwork()]}
         index={0}
         onClose={onClose}
+        onNavigate={() => {}}
       />
     )
     fireEvent.keyDown(window, { key: 'Escape' })

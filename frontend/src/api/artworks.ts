@@ -6,6 +6,8 @@ import type {
   CollectionItem,
   SearchPayload,
   SearchResponse,
+  Artwork,
+  Artist
 } from '@/types/artwork'
 
 export async function searchArtworks(body: SearchPayload): Promise<SearchResponse> {

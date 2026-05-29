@@ -101,8 +101,8 @@ export default function Moodboard({ collection, onArtworkClick }: MoodboardProps
                 width: item.width || defaultWidth,
                 height: item.height || defaultHeight,
               }}
-              onDragStop={(e, d) => handleDragStop(item.id, item.artwork_id, d)}
-              onResizeStop={(e, direction, ref, delta, position) =>
+              onDragStop={(_e, d) => handleDragStop(item.id, item.artwork_id, d)}
+              onResizeStop={(_e, _direction, ref, _delta, position) =>
                 handleResizeStop(item.id, item.artwork_id, ref, position)
               }
               onMouseDown={() => bringToFront(item.id, item.artwork_id)}

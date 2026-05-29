@@ -16,6 +16,7 @@ const mockArtwork = (overrides: Partial<Artwork> = {}): Artwork => ({
   dominant_colors: [[255, 0, 0], [0, 255, 0]],
   phash: 'abc123',
   is_downloaded: true,
+  is_pinned: false,
   created_at: '2024-01-01T00:00:00Z',
   ...overrides,
 })

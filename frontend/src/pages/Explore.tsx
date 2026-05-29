@@ -82,7 +82,7 @@ export default function ExplorePage() {
     },
   })
 
-  const handleLightboxOpen = useCallback((artwork: Artwork, index: number) => {
+  const handleLightboxOpen = useCallback((_artwork: Artwork, index: number) => {
     setLightboxIndex(index)
   }, [])
 
