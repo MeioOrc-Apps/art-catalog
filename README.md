@@ -93,8 +93,10 @@ uv run pytest --cov=src
 **Frontend (React / Vitest):**
 ```bash
 cd frontend
-# Roda todos os testes (modo interativo)
+# Roda todos os testes (uma única vez)
 npm test
+# Roda todos os testes em modo interativo (watch)
+npm run test:watch
 # Roda os testes com interface gráfica no navegador
 npm run test:ui
 # Roda os testes exibindo o relatório de cobertura de código
