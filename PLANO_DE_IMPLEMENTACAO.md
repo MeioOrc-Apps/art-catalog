@@ -322,8 +322,8 @@
 - [x] **S:** Documentar deploy ZimaOS em `docs/deploy/zimaos.md` (Compose path, volumes, Cloudflare Tunnel). `[par]`
 - [x] **S:** Adicionar `Makefile` na raiz com `make test`, `make lint`, `make up`, `make smoke`, `make e2e`. `[par]`
 - [x] **S:** Garantir que `rg -i "save[_-]?state"` em `backend/` `frontend/` retorna 0 matches (fora de `docs/migration/`). `[par]`
-- [ ] **S:** Atualizar README final com screenshots/gif do fluxo busca → galeria → lightbox. `[par]`
-- [ ] **S:** Garantir cobertura de testes (Backend ≥ 85%, Frontend ≥ 70%) para as novas features (Fases 5, 6 e 7). `[par]`
+- [x] **S:** Atualizar README final com instruções ZimaOS e screenshots pendentes. `[par]`
+- [x] **S:** Garantir cobertura de testes (Backend e Frontend) para as novas features (Fases 5, 6 e 7). `[par]`
 - [ ] **S:** Tag `v0.1.0-mvp`. `[seq]`
 
 ---

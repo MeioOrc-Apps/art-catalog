@@ -1,0 +1,57 @@
+name: art-catalog
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: art
+      POSTGRES_USER: art
+      POSTGRES_PASSWORD: art
+    volumes:
+      - /DATA/AppData/art-catalog/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "art"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    image: ghcr.io/sergio-sousa/art-catalog-api:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://art:art@db:5432/art
+      APP_NAME: "Art Catalog"
+      ENV: production
+      ENVIRONMENT: production
+      IMAGES_DIR: /app/data/images
+      JWT_SECRET: change-this-in-production-use-openssl
+      FIRST_ADMIN_EMAIL: admin@example.com
+      FIRST_ADMIN_PASSWORD: admin
+      RATE_LIMITS_DISABLED: "false"
+      COOKIE_SECURE: "true"
+      CORS_ORIGINS: '["http://localhost:5173","http://localhost:3000"]'
+      IMAGE_SEARCH_PROVIDER: mock
+    volumes:
+      - /DATA/AppData/art-catalog/images:/app/data/images
+
+  frontend:
+    image: ghcr.io/sergio-sousa/art-catalog-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+
+x-casaos:
+  author: sergio.sousa
+  category: Media
+  icon: https://raw.githubusercontent.com/sergio-sousa/art-catalog/main/docs/design/icon.png
+  title:
+    custom: Art Catalog
+    en_us: Art Catalog
+  description:
+    en_us: A self-hosted art catalog and moodboard application.
+  port_map: "5173"
+  index: /
+  store_app_id: art-catalog

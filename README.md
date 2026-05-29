@@ -31,6 +31,8 @@ Catálogo pessoal de referências artísticas e moodboard. Você digita o nome d
 
 ## Como rodar localmente
 
+### 1. Desenvolvimento (Docker Compose)
+
 ```bash
 # 1. Copie o arquivo de variáveis de ambiente
 cp .env.example .env
@@ -48,3 +50,12 @@ O frontend estará disponível em `http://localhost:5173`.
 O primeiro usuário admin será criado automaticamente com as credenciais definidas no `.env` (`FIRST_ADMIN_EMAIL` e `FIRST_ADMIN_PASSWORD`).
 
 Faça login, busque um artista, crie suas coleções e monte seus moodboards!
+
+### 2. Implantação no ZimaOS / CasaOS
+
+O Art Catalog é compatível com ZimaOS e CasaOS. Você pode importá-lo como um "Custom App" usando o arquivo `docker-compose.zimaos.yml`.
+
+1. Vá até o painel do ZimaOS/CasaOS.
+2. Clique no ícone de `+` e selecione **Install a customized app**.
+3. Clique em **Import** e cole o conteúdo do arquivo `docker-compose.zimaos.yml` (ajuste as variáveis de ambiente como `JWT_SECRET`, `FIRST_ADMIN_EMAIL` e `FIRST_ADMIN_PASSWORD` antes de instalar).
+4. O ZimaOS lerá o bloco `x-casaos` e configurará o aplicativo automaticamente.

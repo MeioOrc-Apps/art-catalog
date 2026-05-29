@@ -56,20 +56,20 @@ describe('SearchPage', () => {
   it('renders the search form', async () => {
     renderWithQuery(<SearchPage />)
     expect(screen.getByText('Art Catalog')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Buscar artista…')).toBeInTheDocument()
-    expect(screen.getByLabelText('Buscar')).toBeInTheDocument()
+    expect(screen.getAllByPlaceholderText('Buscar artista…')[0]).toBeInTheDocument()
+    expect(screen.getAllByLabelText('Buscar')[0]).toBeInTheDocument()
   })
 
   it('button is disabled when input is empty', () => {
     renderWithQuery(<SearchPage />)
-    const btn = screen.getByLabelText('Buscar')
+    const btn = screen.getAllByLabelText('Buscar')[0]
     expect(btn).toBeDisabled()
   })
 
   it('shows empty state initially', async () => {
     renderWithQuery(<SearchPage />)
     await waitFor(() => {
-      expect(screen.getByText('Busque um artista para começar')).toBeInTheDocument()
+      expect(screen.getByText(/Busque pelo nome de um artista/i)).toBeInTheDocument()
     })
   })
 
@@ -92,9 +92,9 @@ describe('SearchPage', () => {
     const user = userEvent.setup()
     renderWithQuery(<SearchPage />)
 
-    const input = screen.getByPlaceholderText('Buscar artista…')
+    const input = screen.getAllByPlaceholderText('Buscar artista…')[0]
     await user.type(input, 'Test')
-    await user.click(screen.getByLabelText('Buscar'))
+    await user.click(screen.getAllByLabelText('Buscar')[0])
 
     await waitFor(() => {
       expect(
@@ -115,8 +115,8 @@ describe('SearchPage', () => {
     const user = userEvent.setup()
     renderWithQuery(<SearchPage />)
 
-    await user.type(screen.getByPlaceholderText('Buscar artista…'), 'van')
-    await user.click(screen.getByLabelText('Buscar'))
+    await user.type(screen.getAllByPlaceholderText('Buscar artista…')[0], 'van')
+    await user.click(screen.getAllByLabelText('Buscar')[0])
 
     await waitFor(() => {
       expect(screen.getByText('Vincent van Gogh')).toBeInTheDocument()
@@ -124,10 +124,28 @@ describe('SearchPage', () => {
     })
   })
 
-  it('shows delete confirmation when clicking X on chip', async () => {
+  it('shows delete confirmation when clicking delete button', async () => {
     mockListArtists.mockResolvedValue([
-      { id: '1', slug: 'removable', canonical_name: 'Removable', last_searched_at: '2024-01-01', artworks: [] },
+      { 
+        id: '1', 
+        slug: 'removable', 
+        canonical_name: 'Removable', 
+        last_searched_at: '2024-01-01', 
+        artworks: [{ id: 'a1', title: 'A1', image_thumb: 't1', is_pinned: false, created_at: '2024-01-01' }] 
+      },
     ])
+    mockGetArtist.mockResolvedValue({
+      id: '1',
+      slug: 'removable',
+      canonical_name: 'Removable',
+      last_searched_at: '2024-01-01',
+      sync_status: 'ready',
+      created_at: '2024-01-01',
+      artworks: [{ id: 'a1', title: 'A1', image_thumb: 't1', is_pinned: false, created_at: '2024-01-01' }],
+      total: 1,
+      limit: 30,
+      offset: 0
+    })
 
     renderWithQuery(<SearchPage />)
 
@@ -135,7 +153,15 @@ describe('SearchPage', () => {
       expect(screen.getByText('Removable')).toBeInTheDocument()
     })
 
-    const delBtn = screen.getByLabelText('Excluir Removable')
+    // Click the artist card to open it
+    fireEvent.click(screen.getByText('Removable'))
+
+    // Wait for the delete button to appear
+    await waitFor(() => {
+      expect(screen.getByTitle('Excluir Artista')).toBeInTheDocument()
+    })
+
+    const delBtn = screen.getByTitle('Excluir Artista')
     fireEvent.click(delBtn)
 
     await waitFor(() => {
