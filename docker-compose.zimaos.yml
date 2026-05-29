@@ -32,8 +32,9 @@ services:
       FIRST_ADMIN_PASSWORD: admin
       RATE_LIMITS_DISABLED: "false"
       COOKIE_SECURE: "true"
-      CORS_ORIGINS: '["http://localhost:5173","http://localhost:3000"]'
-      IMAGE_SEARCH_PROVIDER: mock
+      CORS_ORIGINS: '["*"]'
+      IMAGE_SEARCH_PROVIDER: brave
+      BRAVE_API_KEY: "sua-chave-aqui"
     volumes:
       - /DATA/AppData/art-catalog/images:/app/data/images
 
