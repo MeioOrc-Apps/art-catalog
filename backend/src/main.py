@@ -56,8 +56,8 @@ async def _bootstrap_first_admin() -> None:
     from sqlalchemy import select
 
     from src.auth.models import User
-    from src.core.config import settings
     from src.core import database
+    from src.core.config import settings
 
     email = settings.FIRST_ADMIN_EMAIL
     password = settings.FIRST_ADMIN_PASSWORD
