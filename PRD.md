@@ -35,18 +35,18 @@ artista vêm do cache local.
 ## 2. Escopo
 
 ### Dentro do MVP
-- [ ] Busca de obras por nome de artista.
-- [ ] Download e processamento de imagens em boa resolução (original / large / thumb).
-- [ ] Extração de paleta de cores dominante por obra.
-- [ ] Deduplicação de imagens repetidas.
-- [ ] Cache: artista já buscado não rebate na API externa (com opção de `refresh`).
-- [ ] Galeria masonry com lightbox.
-- [ ] Coleções pessoais (agrupar obras favoritas).
-- [ ] Autenticação e convites (reusar do Save State — ver seção 4).
+- [x] Busca de obras por nome de artista (processamento assíncrono em background).
+- [x] Download e processamento de imagens em boa resolução (original / large / thumb).
+- [x] Extração de paleta de cores dominante por obra.
+- [x] Deduplicação de imagens repetidas.
+- [x] Cache: artista já buscado não rebate na API externa (com opção de `refresh`).
+- [x] Galeria masonry com lightbox.
+- [x] Coleções pessoais (agrupar obras favoritas).
+- [x] Autenticação e convites (reusar do Save State — ver seção 4).
 
-### Fora do MVP (plus futuro)
-- Wiki / biografia enriquecida por LLM.
-- Busca por similaridade visual (embeddings/CLIP).
+### Fora do MVP (V2)
+- Wiki / biografia enriquecida por LLM (geração de contexto histórico do artista).
+- Busca por similaridade visual (embeddings/CLIP) para encontrar obras parecidas em todo o catálogo.
 - Filtro por paleta de cores.
 
 ## 3. Stack
@@ -274,20 +274,43 @@ DEFAULT_RESULTS_PER_SEARCH=30
 - **DoD:** `docker compose up` sobe `db` + `api` (hello world) + `frontend` (hello world).
 
 ### Fase 1 — Fundação (copiar do Save State)
-- [ ] Auth, convites, CSRF, rate limit, roles, páginas de login/registro.
+- [x] Auth, convites, CSRF, rate limit, roles, páginas de login/registro.
 - **DoD:** criar admin, gerar convite, registrar member, login persistente, logout.
 
 ### Fase 2 — Busca e pipeline
-- [ ] Models de domínio + migration; providers (mock primeiro); pipeline de imagens; `POST /artworks/search`.
+- [x] Models de domínio + migration; providers (mock primeiro); pipeline de imagens; `POST /artworks/search`.
 - **DoD:** com `mock`, buscar "Egon Schiele" baixa N imagens, gera 3 versões + paleta, persiste, dedup funciona.
 
 ### Fase 3 — Galeria
-- [ ] Página de busca, `Gallery` masonry, `Lightbox`, estado de loading, lista de artistas (cache).
+- [x] Página de busca, `Gallery` masonry, `Lightbox`, estado de loading, lista de artistas (cache).
 - **DoD:** buscar pela UI exibe o grid; clicar abre o lightbox; rebuscar usa cache.
 
 ### Fase 4 — Coleções + provider real
-- [ ] Coleções pessoais; ligar `serpapi`/`google`; filtro mínimo.
+- [x] Coleções pessoais; ligar `serpapi`/`google`/`duckduckgo`; filtro mínimo.
 - **DoD:** criar coleção, adicionar obras; busca real retorna obras de verdade.
+
+### Fase 5 — Melhorias de UX (Pós-MVP)
+- [x] Busca de imagens assíncrona em background com polling no frontend (status: `ready`, `processing`, `error`).
+- [x] Visão "Acervo" (Empty State) com grid de artistas e miniaturas de suas obras.
+
+### Fase 6 — Moodboard e Upload Manual
+- [x] Endpoint de upload manual de imagens para um artista existente.
+- [x] UI para upload (seleção de arquivos locais na galeria do artista).
+- [x] Modo "Painel/Moodboard" nas coleções (drag & drop livre, redimensionamento, sobreposição com z-index).
+- **DoD:** Usuário consegue subir uma foto do computador para um artista. Usuário consegue abrir uma coleção em modo "Painel" e organizar as imagens livremente pela tela.
+
+### Fase 7 — Refinamentos de UX e Gestão
+- [x] Fixar obras no topo (Pin) e ordenação de artistas (Recentes vs A-Z).
+- [x] Painel de controle completo para Admin (gestão de usuários, alteração de cargos, ativação/desativação).
+- [x] Redesign do Lightbox (informações no rodapé e título centralizado).
+- [x] Redesign da tela de Coleções (miniaturas em mosaico).
+- [x] Correções de layout (scrollbar-gutter, ordem do masonry left-to-right, busca mobile responsiva).
+- [x] Filtro global por paleta de cores dominante (Página Explorar).
+- **DoD:** Usuário consegue fixar obras favoritas no topo do artista. Admin consegue desativar usuários ou promover membros. Layout da galeria e coleções consistente e sem "pulos" de scrollbar. Usuário consegue explorar todo o catálogo filtrando por cores.
+
+### Fase 8 — V2 (Futuro)
+- [ ] Wiki / biografia enriquecida por IA (LLM) na página do artista.
+- [ ] Busca por similaridade visual usando embeddings (CLIP).
 
 ## 14. Riscos / decisões em aberto
 

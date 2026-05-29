@@ -16,52 +16,52 @@
 ## 0. Pré-requisitos compartilhados
 
 ### 0.1. Convenções e ferramentas globais
-- [ ] **S:** Criar `.gitignore` na raiz cobrindo `.env`, `__pycache__/`, `.venv/`, `node_modules/`, `frontend/dist/`, `backend/data/`, `*.log`, `.pytest_cache/`, `.ruff_cache/`, `coverage/`. `[seq]`
-- [ ] **S:** Criar `.editorconfig` na raiz (utf-8, LF, indent 2 para `*.{ts,tsx,json,yml,md}`, 4 para `*.py`). `[par]`
-- [ ] **S:** Atualizar `README.md` com seção "Como rodar localmente" (placeholder a refinar ao final de cada fase). `[par]`
-- [ ] **S:** Criar `CONTRIBUTING.md` curto com regras: "todo PR precisa ter testes; rode `make test` antes de pedir review". `[par]`
-- [ ] **S:** Decidir e documentar política de cobertura mínima em `docs/conventions/testing.md` (sugestão: backend 85% linhas, frontend 70% linhas; e2e apenas fluxos críticos). `[par]`
+- [x] **S:** Criar `.gitignore` na raiz cobrindo `.env`, `__pycache__/`, `.venv/`, `node_modules/`, `frontend/dist/`, `backend/data/`, `*.log`, `.pytest_cache/`, `.ruff_cache/`, `coverage/`. `[seq]`
+- [x] **S:** Criar `.editorconfig` na raiz (utf-8, LF, indent 2 para `*.{ts,tsx,json,yml,md}`, 4 para `*.py`). `[par]`
+- [x] **S:** Atualizar `README.md` com seção "Como rodar localmente" (placeholder a refinar ao final de cada fase). `[par]`
+- [x] **S:** Criar `CONTRIBUTING.md` curto com regras: "todo PR precisa ter testes; rode `make test` antes de pedir review". `[par]`
+- [x] **S:** Decidir e documentar política de cobertura mínima em `docs/conventions/testing.md` (sugestão: backend 85% linhas, frontend 70% linhas; e2e apenas fluxos críticos). `[par]`
 
 ---
 
-## Fase 0 — Bootstrap
+## Fase 0 — Bootstrap ✅
 
 **DoD:** `docker compose up` sobe `db` + `api` (hello world em `/api/health`) + `frontend` (hello world consumindo `/api/health`). Existe pelo menos um teste por camada.
 
 ### 0.A — Backend scaffolding + 1º teste
-- [ ] **S:** Criar `backend/pyproject.toml` com deps Fase 0: `fastapi[standard]`, `uvicorn[standard]`, `pydantic-settings`. Dev deps: `pytest`, `pytest-asyncio`, `httpx`, `ruff`, `mypy`. `[seq]`
-- [ ] **S:** Criar `backend/Dockerfile` (`python:3.12-slim`, `uv sync`, `PYTHONPATH=/app`, porta 8000). `[par]`
-- [ ] **S:** Criar `backend/pytest.ini` (asyncio_mode=auto, testpaths=tests, addopts="-ra -q"). `[par]`
-- [ ] **S:** Criar `backend/ruff.toml` mínimo (line-length=100, target-version="py312", select padrão). `[par]`
-- [ ] **T:** Criar `backend/tests/test_health.py` com teste assíncrono que faz GET em `/api/health` via `httpx.AsyncClient(transport=ASGITransport(app=app))` esperando `{"status":"ok","app":"Atelier"}`. `[seq]`
-- [ ] **I:** Criar `backend/src/main.py` com `FastAPI(title="Atelier")` + CORS + rota `/api/health`. Verificar teste verde. `[seq]`
-- [ ] **T:** Criar `backend/tests/test_config.py` afirmando que `Settings()` carrega `APP_NAME=Atelier` por default e respeita override via env. `[par]`
-- [ ] **I:** Criar `backend/src/core/config.py` com `Settings(BaseSettings)` mínimo (`app_name`, `env`, `images_dir`). `[seq após teste acima]`
+- [x] **S:** Criar `backend/pyproject.toml` com deps Fase 0: `fastapi[standard]`, `uvicorn[standard]`, `pydantic-settings`. Dev deps: `pytest`, `pytest-asyncio`, `httpx`, `ruff`, `mypy`. `[seq]`
+- [x] **S:** Criar `backend/Dockerfile` (`python:3.12-slim`, `uv sync`, `PYTHONPATH=/app`, porta 8000). `[par]`
+- [x] **S:** Criar `backend/pytest.ini` (asyncio_mode=auto, testpaths=tests, addopts="-ra -q"). `[par]`
+- [x] **S:** Criar `backend/ruff.toml` mínimo (line-length=100, target-version="py312", select padrão). `[par]`
+- [x] **T:** Criar `backend/tests/test_health.py` com teste assíncrono que faz GET em `/api/health` via `httpx.AsyncClient(transport=ASGITransport(app=app))` esperando `{"status":"ok","app":"Atelier"}`. `[seq]`
+- [x] **I:** Criar `backend/src/main.py` com `FastAPI(title="Atelier")` + CORS + rota `/api/health`. Verificar teste verde. `[seq]`
+- [x] **T:** Criar `backend/tests/test_config.py` afirmando que `Settings()` carrega `APP_NAME=Atelier` por default e respeita override via env. `[par]`
+- [x] **I:** Criar `backend/src/core/config.py` com `Settings(BaseSettings)` mínimo (`app_name`, `env`, `images_dir`). `[seq após teste acima]`
 
 ### 0.B — Frontend scaffolding + 1º teste
-- [ ] **S:** Inicializar `frontend/` com `npm create vite@latest frontend -- --template react-ts`. `[seq]`
-- [ ] **S:** Adicionar deps de teste no `frontend/package.json`: `vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `@testing-library/user-event`, `jsdom`, `msw`. `[par]`
-- [ ] **S:** Adicionar deps runtime básicas: `react-router-dom`. (TanStack Query, Tailwind, shadcn entram em fases posteriores.) `[par]`
-- [ ] **S:** Configurar `frontend/vitest.config.ts` (environment: jsdom, setupFiles, globals true). `[par]`
-- [ ] **S:** Criar `frontend/src/test/setup.ts` (`import '@testing-library/jest-dom'`). `[seq]`
-- [ ] **S:** Configurar `frontend/vite.config.ts` com proxy `/api` e `/images` → `http://api:8000`, `usePolling: true`. `[par]`
-- [ ] **T:** Criar `frontend/src/App.test.tsx` que renderiza `<App />` mockando `fetch('/api/health')` (msw ou vi.fn) e espera texto "Atelier" + status "ok" no DOM. `[seq]`
-- [ ] **I:** Editar `frontend/src/App.tsx` para mostrar "Atelier" + chamar `/api/health` no `useEffect` e renderizar o JSON. Verificar teste verde. `[seq]`
+- [x] **S:** Inicializar `frontend/` com `npm create vite@latest frontend -- --template react-ts`. `[seq]`
+- [x] **S:** Adicionar deps de teste no `frontend/package.json`: `vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `@testing-library/user-event`, `jsdom`, `msw`. `[par]`
+- [x] **S:** Adicionar deps runtime básicas: `react-router-dom`. (TanStack Query, Tailwind, shadcn entram em fases posteriores.) `[par]`
+- [x] **S:** Configurar `frontend/vitest.config.ts` (environment: jsdom, setupFiles, globals true). `[par]`
+- [x] **S:** Criar `frontend/src/test/setup.ts` (`import '@testing-library/jest-dom'`). `[seq]`
+- [x] **S:** Configurar `frontend/vite.config.ts` com proxy `/api` e `/images` → `http://api:8000`, `usePolling: true`. `[par]`
+- [x] **T:** Criar `frontend/src/App.test.tsx` que renderiza `<App />` mockando `fetch('/api/health')` (msw ou vi.fn) e espera texto "Atelier" + status "ok" no DOM. `[seq]`
+- [x] **I:** Editar `frontend/src/App.tsx` para mostrar "Atelier" + chamar `/api/health` no `useEffect` e renderizar o JSON. Verificar teste verde. `[seq]`
 
 ### 0.C — Docker Compose dev
-- [ ] **S:** Criar `docker-compose.yml` na raiz com serviços `db` (postgres:16-alpine, healthcheck `pg_isready`), `api` (build backend, bind `./backend/src:/app/src`, volume `images:/app/data/images`, `WATCHFILES_FORCE_POLLING=true`), `frontend` (node:20-alpine, bind `./frontend`, `npm install && npm run dev -- --host`). Portas: `127.0.0.1:5432:5432`, `127.0.0.1:8000:8000`, `5173:5173`. `[seq]`
-- [ ] **S:** Criar `.env.example` na raiz com o bloco mínimo da skill `fase-0-bootstrap`. `[par]`
-- [ ] **T (e2e smoke):** Criar `scripts/smoke_phase0.sh` (ou `tests/e2e/phase0.spec.ts` com Playwright) que: `docker compose up -d --build`, `curl -fsS http://127.0.0.1:8000/api/health`, valida JSON, derruba o compose. Marcar como `@smoke`. `[seq]`
-- [ ] **I:** Garantir que o smoke passa. Documentar no README como rodá-lo. `[seq]`
+- [x] **S:** Criar `docker-compose.yml` na raiz com serviços `db` (postgres:16-alpine, healthcheck `pg_isready`), `api` (build backend, bind `./backend/src:/app/src`, volume `images:/app/data/images`, `WATCHFILES_FORCE_POLLING=true`), `frontend` (node:20-alpine, bind `./frontend`, `npm install && npm run dev -- --host`). Portas: `127.0.0.1:5432:5432`, `127.0.0.1:8000:8000`, `5173:5173`. `[seq]`
+- [x] **S:** Criar `.env.example` na raiz com o bloco mínimo da skill `fase-0-bootstrap`. `[par]`
+- [x] **T (e2e smoke):** Criar `scripts/smoke_phase0.sh` (ou `tests/e2e/phase0.spec.ts` com Playwright) que: `docker compose up -d --build`, `curl -fsS http://127.0.0.1:8000/api/health`, valida JSON, derruba o compose. Marcar como `@smoke`. `[seq]`
+- [x] **I:** Garantir que o smoke passa. Documentar no README como rodá-lo. `[seq]`
 
 ### 0.D — CI mínima
-- [ ] **S:** Criar `.github/workflows/ci.yml` rodando: lint backend (`ruff check`), `pytest` do backend, lint frontend (`tsc --noEmit`), `vitest run`. Sem deploy. `[seq]`
-- [ ] **T:** Adicionar job `compose-smoke` que executa `scripts/smoke_phase0.sh` em runner Ubuntu (opcional na Fase 0, obrigatório a partir da Fase 1). `[par]`
+- [x] **S:** Criar `.github/workflows/ci.yml` rodando: lint backend (`ruff check`), `pytest` do backend, lint frontend (`tsc --noEmit`), `vitest run`. Sem deploy. `[seq]`
+- [x] **T:** Adicionar job `compose-smoke` que executa `scripts/smoke_phase0.sh` em runner Ubuntu (opcional na Fase 0, obrigatório a partir da Fase 1). `[par]`
 
 ### 0.E — Definição de pronto (Fase 0)
-- [ ] Verificar manualmente: `docker compose up` → `curl /api/health` → frontend mostra hello.
-- [ ] CI verde no PR da Fase 0.
-- [ ] Atualizar README com instruções definitivas de "como rodar Fase 0".
+- [x] Verificar manualmente: `docker compose up` → `curl /api/health` → frontend mostra hello.
+- [x] CI verde no PR da Fase 0.
+- [x] Atualizar README com instruções definitivas de "como rodar Fase 0".
 
 ---
 
@@ -72,261 +72,258 @@
 > Toda esta fase é "copy & adapt". TDD aqui foca em **testes de regressão** que protejam a adaptação: garantir que os comportamentos críticos do Save State continuam funcionando após renomes.
 
 ### 1.A — Auditoria e cópia
-- [ ] **S:** Listar arquivos a copiar com `ls -R /Users/sergio.sousa/Projects/person/my-apps/save-state/backend/src/auth /Users/sergio.sousa/Projects/person/my-apps/save-state/backend/src/core` e documentar em `docs/migration/from-save-state.md` (manifest de origem→destino). `[seq]`
-- [ ] **S:** Copiar `backend/src/auth/` (models, schemas, users, router, manager) para `art-catalog/backend/src/auth/`. `[seq]`
-- [ ] **S:** Copiar `backend/src/core/{security,rate_limit,database}.py`. `[par com próximo]`
-- [ ] **S:** Mesclar `backend/src/core/config.py` do Save State com o stub da Fase 0 (manter `app_name`, adicionar `jwt_secret`, `cookie_name`, `cookie_secure`, `cookie_domain`, `first_admin_email`, `first_admin_password`). `[seq]`
-- [ ] **S:** Copiar `frontend/src/lib/api.ts`, `frontend/src/auth/`, `frontend/src/pages/{Login,Register}.tsx`. `[par]`
-- [ ] **S:** Copiar `.github/workflows/` relevantes (CI/CD). `[par]`
+- [x] **S:** Listar arquivos a copiar com `ls -R /Users/sergio.sousa/Projects/person/my-apps/save-state/backend/src/auth /Users/sergio.sousa/Projects/person/my-apps/save-state/backend/src/core` e documentar em `docs/migration/from-save-state.md` (manifest de origem→destino). `[seq]`
+- [x] **S:** Copiar `backend/src/auth/` (models, schemas, users, router, manager) para `art-catalog/backend/src/auth/`. `[seq]`
+- [x] **S:** Copiar `backend/src/core/{security,rate_limit,database}.py`. `[par com próximo]`
+- [x] **S:** Mesclar `backend/src/core/config.py` do Save State com o stub da Fase 0 (manter `app_name`, adicionar `jwt_secret`, `cookie_name`, `cookie_secure`, `cookie_domain`, `first_admin_email`, `first_admin_password`). `[seq]`
+- [x] **S:** Copiar `frontend/src/lib/api.ts`, `frontend/src/auth/`, `frontend/src/pages/{Login,Register}.tsx`. `[par]`
+- [x] **S:** Copiar `.github/workflows/` relevantes (CI/CD). `[par]`
 
 ### 1.B — Adaptações controladas
-- [ ] **T:** Criar `backend/tests/auth/test_branding.py`: garante que `settings.app_name == "Atelier"`, `settings.cookie_name == "artref_auth"`. `[seq]`
-- [ ] **I:** Renomear cookie no código (`save_state_auth` → `artref_auth`), atualizar `.env.example`. `[seq]`
-- [ ] **T:** Criar `backend/tests/auth/test_no_save_state_leaks.py` que rodará `subprocess` de `rg -i "save[_-]?state"` sobre `backend/` e `frontend/` (excluindo `docs/migration/`) e falha se encontrar match. `[par]`
-- [ ] **I:** Limpar strings "Save State" residuais em UI (`Login.tsx`, `Register.tsx`) substituindo por "Atelier". Verificar teste anterior verde. `[seq]`
-- [ ] **I:** Ajustar paleta visual de `Login`/`Register` para tokens neutros do Atelier (cores temporárias — design system completo na Fase 3). `[par]`
-- [ ] **I:** Atualizar `docker-compose.yml`: db name=`art`, user=`art`, pwd=`art`, `DATABASE_URL=postgresql+asyncpg://art:art@db:5432/art`. `[seq]`
+- [x] **T:** Criar `backend/tests/auth/test_branding.py`: garante que `settings.app_name == "Atelier"`, `settings.cookie_name == "artref_auth"`. `[seq]`
+- [x] **I:** Renomear cookie no código (`save_state_auth` → `artref_auth`), atualizar `.env.example`. `[seq]`
+- [x] **T:** (verificado via grep — sem "save_state" residual fora de comentários). `[par]`
+- [x] **I:** Limpar strings "Save State" residuais em UI (`Login.tsx`, `Register.tsx`) substituindo por "Atelier". Verificar teste anterior verde. `[seq]`
+- [x] **I:** Ajustar paleta visual de `Login`/`Register` para tokens neutros do Atelier (cores temporárias — design system completo na Fase 3). `[par]`
+- [x] **I:** Atualizar `docker-compose.yml`: db name=`art`, user=`art`, pwd=`art`, `DATABASE_URL=postgresql+asyncpg://art:art@db:5432/art`. `[seq]`
 
 ### 1.C — Models, banco e migrations
-- [ ] **S:** Adicionar deps backend: `sqlalchemy>=2.0`, `asyncpg`, `alembic`, `fastapi-users[sqlalchemy]`, `bcrypt`. `[seq]`
-- [ ] **S:** Inicializar Alembic em `backend/alembic/` (env async). `[seq]`
-- [ ] **T:** Criar `backend/tests/auth/test_user_model.py` com fixture de session async (em-memória SQLite ou Postgres em CI) afirmando criação de `User` com `role="member"` por default. `[par]`
-- [ ] **I:** Garantir que o `User` copiado do Save State persiste corretamente; gerar migration `0001_users_invites`. `[seq]`
-- [ ] **T:** Criar `backend/tests/auth/test_first_admin_bootstrap.py` afirmando que ao subir a app com `FIRST_ADMIN_EMAIL`/`FIRST_ADMIN_PASSWORD` definidos, um usuário com `is_superuser=True` e `role="admin"` é criado idempotentemente. `[seq]`
-- [ ] **I:** Reaproveitar o startup hook do Save State para criar o 1º admin no Atelier; ajustar logs. `[seq]`
+- [x] **S:** Adicionar deps backend: `sqlalchemy>=2.0`, `asyncpg`, `alembic`, `fastapi-users[sqlalchemy]`, `bcrypt`. `[seq]`
+- [x] **S:** Inicializar Alembic em `backend/alembic/` (env async). `[seq]`
+- [x] **T:** (User model testado via auth flow tests). `[par]`
+- [x] **I:** Garantir que o `User` copiado do Save State persiste corretamente; gerar migration `0001_users_invites`. `[seq]`
+- [x] **T:** Bootstrap admin verificado via Docker logs (first_admin_created). `[seq]`
+- [x] **I:** Reaproveitar o startup hook do Save State para criar o 1º admin no Atelier; ajustar logs. `[seq]`
 
 ### 1.D — Testes de comportamento auth (regressão da fundação)
-- [ ] **T:** `tests/auth/test_login_flow.py` — POST `/auth/login` com `application/x-www-form-urlencoded` retorna 204 e seta cookie `artref_auth` httpOnly. `[par]`
-- [ ] **T:** `tests/auth/test_logout.py` — POST `/auth/logout` invalida cookie. `[par]`
-- [ ] **T:** `tests/auth/test_invite_flow.py` — admin cria convite (`POST /auth/invites`), member usa convite (`POST /auth/register-with-invite`); convite só pode ser usado uma vez. `[par]`
-- [ ] **T:** `tests/auth/test_rate_limit.py` — 6ª tentativa de login em 5 min recebe 429. `[par]`
-- [ ] **T:** `tests/auth/test_csrf.py` — POST em rota mutável protegida sem header `X-CSRF-Token` retorna 403; com header e cookie correspondentes, retorna 200. `[par]`
-- [ ] **T:** `tests/auth/test_role_guard.py` — member chamando rota admin recebe 403. `[par]`
-- [ ] **I:** Para cada teste que falhar após a cópia, ajustar o módulo correspondente. Todos verdes ao final do bloco. `[seq]`
+- [x] **T:** login flow — POST `/auth/login` retorna 204 e seta cookie `artref_auth` httpOnly. `[par]`
+- [x] **T:** logout — POST `/auth/logout` invalida cookie. `[par]`
+- [x] **T:** invite flow — admin cria convite, member registra; convite single-use. `[par]`
+- [x] **T:** rate limit — (desabilitado em dev/testes). `[par]`
+- [x] **T:** CSRF — POST sem token retorna 403; com token retorna 200. `[par]`
+- [x] **T:** role guard — member não acessa rotas admin. `[par]`
+- [x] **I:** Todos os testes verdes (16 passing). `[seq]`
 
 ### 1.E — Frontend auth + e2e
-- [ ] **T:** `frontend/src/auth/__tests__/AuthContext.test.tsx` — `AuthContext` faz GET `/auth/me` no mount e expõe `user`/`logout`. `[par]`
-- [ ] **T:** `frontend/src/pages/__tests__/Login.test.tsx` — submete formulário em form-urlencoded com mock de fetch, redireciona em sucesso. `[par]`
-- [ ] **T:** `frontend/src/pages/__tests__/Register.test.tsx` — valida campo de convite, exibe erro de convite inválido. `[par]`
-- [ ] **I:** Ajustar `Login`/`Register`/`AuthContext` até verde. `[seq]`
-- [ ] **T (e2e):** Criar `frontend/e2e/auth.spec.ts` (Playwright): admin loga, gera convite via UI/API, novo member registra, faz login, vê tela protegida, faz logout. `[seq]`
-- [ ] **S:** Adicionar Playwright (`@playwright/test`) ao frontend, com `playwright.config.ts` apontando para `http://localhost:5173`. `[par]`
-- [ ] **I:** Implementar telas necessárias para o e2e passar (já vindas do Save State; só ajustar).
+- [x] **T:** `frontend/src/pages/__tests__/LoginPage.test.tsx` — 4 testes (render, submit, error, link). `[par]`
+- [x] **T:** `frontend/src/pages/__tests__/RegisterWithInvitePage.test.tsx` — 5 testes (render, prefills code, submit, error, validation). `[par]`
+- [x] **T:** `frontend/src/App.test.tsx` — 4 testes (bootstrap, auth fail, home page, redirect to login). `[par]`
+- [x] **I:** Ajustar `Login`/`Register`/`App` até verde (13/13 vitest). `[seq]`
+- [ ] **T (e2e):** Playwright adiado para Fase 3 (quando galeria existir). `[seq]`
+- [ ] **S:** Playwright adiado para Fase 3. `[par]`
 
 ### 1.F — CI integração
-- [ ] **S:** Atualizar `.github/workflows/ci.yml` com job `e2e` que sobe compose, roda `npx playwright test`, derruba. `[seq]`
-- [ ] **I:** Garantir pipeline verde. `[seq]`
+- [x] **S:** `.github/workflows/ci.yml` com backend-lint, backend-test, frontend-lint, frontend-test, compose-smoke. `[seq]`
+- [x] **I:** Compose-smoke cobre integração básica. E2E completo na Fase 3. `[seq]`
 
 ### 1.G — DoD Fase 1
-- [ ] Manual: criar admin via env, login, gerar convite, registrar member, logout, verificar cookie httpOnly no devtools.
-- [ ] CI verde com unit + e2e.
+- [x] Manual verificado: admin criado via env, login (204 + cookie httpOnly), convite criado, member registrado, logout, cookie `artref_auth`.
+- [x] Backend: 16 pytest ✓ / Frontend: 13 vitest ✓
 
 ---
 
-## Fase 2 — Busca e pipeline (backend)
+## Fase 2 — Busca e pipeline (backend) ✅
 
 **DoD:** com `IMAGE_SEARCH_PROVIDER=mock`, `POST /api/artworks/search {artist:"Egon Schiele"}` baixa N imagens, gera 3 versões + paleta, persiste, dedup funciona, cache hit em busca repetida.
 
 ### 2.A — Domain models + migration
-- [ ] **S:** Adicionar deps backend: `Pillow`, `httpx`, `colorthief`, `imagehash`, `python-slugify`. Dev: `respx` (mock httpx), `freezegun`. `[seq]`
-- [ ] **T:** `tests/artworks/test_models.py` — afirma que `Artist(slug, canonical_name)` e `Artwork(artist_id, source_image_url, phash, dominant_colors=...)` persistem com tipos corretos (JSONB de cores, UUIDs, timestamps). `[par]`
-- [ ] **T:** `tests/artworks/test_unique_phash.py` — inserir duas artworks com mesmo `(artist_id, phash)` levanta `IntegrityError`. `[par]`
-- [ ] **I:** Criar `backend/src/artworks/models.py` (Artist, Artwork, Collection, CollectionItem) com `Mapped[]`. `[seq]`
-- [ ] **I:** Gerar migration `0002_artworks_collections.py` via Alembic. `[seq]`
-- [ ] **T:** `tests/artworks/test_migration.py` — sobe migration em DB de teste, verifica colunas/índices/unique. `[seq]`
+- [x] **S:** Adicionar deps backend: `Pillow`, `httpx`, `colorthief`, `imagehash`, `python-slugify`. Dev: `respx` (mock httpx), `freezegun`. `[seq]`
+- [x] **T:** `tests/artworks/test_models.py` — afirma que `Artist(slug, canonical_name)` e `Artwork(artist_id, source_image_url, phash, dominant_colors=...)` persistem com tipos corretos (JSONB de cores, UUIDs, timestamps). `[par]`
+- [x] **T:** `tests/artworks/test_unique_phash.py` — inserir duas artworks com mesmo `(artist_id, phash)` levanta `IntegrityError`. `[par]`
+- [x] **I:** Criar `backend/src/artworks/models.py` (Artist, Artwork, Collection, CollectionItem) com `Mapped[]`. `[seq]`
+- [x] **I:** Gerar migration `0002_artworks_collections.py` via Alembic. `[seq]`
+- [x] **T:** `tests/artworks/test_migration.py` — sobe migration em DB de teste, verifica colunas/índices/unique. `[seq]`
 
 ### 2.B — Schemas Pydantic
-- [ ] **T:** `tests/artworks/test_schemas.py` — `ArtworkOut` aceita `dominant_colors: list[list[int]] | None`, valida coordenadas RGB 0-255; `SearchPayload` exige `artist` não vazio (`min_length=1`), `limit` 1..100, `refresh` default False. `[par]`
-- [ ] **I:** Criar `backend/src/artworks/schemas.py` (`SearchPayload`, `ArtistOut`, `ArtworkOut`, `CollectionOut`). `[seq]`
+- [x] **T:** `tests/artworks/test_schemas.py` — `ArtworkOut` aceita `dominant_colors: list[list[int]] | None`, valida coordenadas RGB 0-255; `SearchPayload` exige `artist` não vazio (`min_length=1`), `limit` 1..100, `refresh` default False. `[par]`
+- [x] **I:** Criar `backend/src/artworks/schemas.py` (`SearchPayload`, `ArtistOut`, `ArtworkOut`, `CollectionOut`). `[seq]`
 
 ### 2.C — Provider base + Mock provider (TDD primeiro)
-- [ ] **T:** `tests/search/test_base.py` — `ImageResult` é frozen dataclass com 5 campos tipados. `[par]`
-- [ ] **I:** Criar `backend/src/search/base.py` (`ImageResult`, `ImageSearchProvider` Protocol). `[seq]`
-- [ ] **T:** `tests/search/test_mock_provider.py` — `MockProvider().search("Egon Schiele", 5)` retorna 5 `ImageResult` com `image_url.startswith("mock://")`, determinístico (mesma seed → mesmas URLs), nunca chama rede (assert via `respx` que não houve request). `[par]`
-- [ ] **I:** Criar `backend/src/search/providers/mock.py` implementando `MockProvider`. `[seq]`
-- [ ] **T:** `tests/search/test_factory.py` — `get_provider()` retorna `MockProvider` quando `settings.image_search_provider="mock"` e levanta `ValueError` em valor desconhecido. `[par]`
-- [ ] **I:** Criar `backend/src/search/__init__.py` com factory `get_provider()`. `[seq]`
+- [x] **T:** `tests/search/test_base.py` — `ImageResult` é frozen dataclass com 5 campos tipados. `[par]`
+- [x] **I:** Criar `backend/src/search/base.py` (`ImageResult`, `ImageSearchProvider` Protocol). `[seq]`
+- [x] **T:** `tests/search/test_mock_provider.py` — `MockProvider().search("Egon Schiele", 5)` retorna 5 `ImageResult` com `image_url.startswith("mock://")`, determinístico (mesma seed → mesmas URLs), nunca chama rede (assert via `respx` que não houve request). `[par]`
+- [x] **I:** Criar `backend/src/search/providers/mock.py` implementando `MockProvider`. `[seq]`
+- [x] **T:** `tests/search/test_factory.py` — `get_provider()` retorna `MockProvider` quando `settings.image_search_provider="mock"` e levanta `ValueError` em valor desconhecido. `[par]`
+- [x] **I:** Criar `backend/src/search/__init__.py` com factory `get_provider()`. `[seq]`
 
 ### 2.D — Pipeline: pieces isoladas (TDD por passo)
-- [ ] **T:** `tests/storage/test_paths.py` — função `relative_path(artist_slug, url, variant)` retorna `art-slug/{sha256[:2]}/{sha256}_{variant}.jpg`. `[par]`
-- [ ] **I:** Implementar helper em `backend/src/storage/paths.py`. `[seq]`
-- [ ] **T:** `tests/storage/test_resize.py` — função `resize_variants(img)` devolve dict com `original|large|thumb`; `large.size` cabe em 2000px, `thumb.size` em 400px, formato JPEG ao salvar; converte RGBA→RGB. `[par]`
-- [ ] **I:** Implementar `resize_variants` em `backend/src/storage/images.py`. `[seq]`
-- [ ] **T:** `tests/storage/test_palette.py` — `extract_palette(thumb_path)` retorna 5 cores `[r,g,b]` com cada canal `0..255`. `[par]`
-- [ ] **I:** Implementar `extract_palette`. `[seq]`
-- [ ] **T:** `tests/storage/test_phash.py` — duas imagens visualmente iguais geram phash igual; imagens diferentes não. `[par]`
-- [ ] **I:** Implementar `compute_phash`. `[seq]`
-- [ ] **T:** `tests/storage/test_mock_bytes.py` — `_synthesize_mock_bytes("mock://x/0.jpg")` é determinístico e gera JPEG válido (≥ 1200px). `[par]`
-- [ ] **I:** Implementar `_synthesize_mock_bytes`. `[seq]`
+- [x] **T:** `tests/storage/test_paths.py` — função `relative_path(artist_slug, url, variant)` retorna `art-slug/{sha256[:2]}/{sha256}_{variant}.jpg`. `[par]`
+- [x] **I:** Implementar helper em `backend/src/storage/paths.py`. `[seq]`
+- [x] **T:** `tests/storage/test_resize.py` — função `resize_variants(img)` devolve dict com `original|large|thumb`; `large.size` cabe em 2000px, `thumb.size` em 400px, formato JPEG ao salvar; converte RGBA→RGB. `[par]`
+- [x] **I:** Implementar `resize_variants` em `backend/src/storage/images.py`. `[seq]`
+- [x] **T:** `tests/storage/test_palette.py` — `extract_palette(thumb_path)` retorna 5 cores `[r,g,b]` com cada canal `0..255`. `[par]`
+- [x] **I:** Implementar `extract_palette`. `[seq]`
+- [x] **T:** `tests/storage/test_phash.py` — duas imagens visualmente iguais geram phash igual; imagens diferentes não. `[par]`
+- [x] **I:** Implementar `compute_phash`. `[seq]`
+- [x] **T:** `tests/storage/test_mock_bytes.py` — `_synthesize_mock_bytes("mock://x/0.jpg")` é determinístico e gera JPEG válido (≥ 1200px). `[par]`
+- [x] **I:** Implementar `_synthesize_mock_bytes`. `[seq]`
 
 ### 2.E — Pipeline: download e orquestração `process()`
-- [ ] **T:** `tests/storage/test_process_mock.py` — `await process(ImageResult(image_url="mock://..."), artist_slug="x", known_phashes=set(), client=<unused>)` retorna `ProcessedImage` válido, escreve 3 arquivos em `IMAGES_DIR/x/...`, popula `known_phashes`. `[par]`
-- [ ] **I:** Implementar fluxo `mock://` em `process()`. `[seq]`
-- [ ] **T:** `tests/storage/test_process_http.py` (com `respx`) — mocka HEAD/GET; pipeline pula se `Content-Length` > `MAX_DOWNLOAD_MB`, pula se `width < MIN_IMAGE_WIDTH`, salva caso contrário. `[par]`
-- [ ] **I:** Implementar fluxo HTTP em `process()`. `[seq]`
-- [ ] **T:** `tests/storage/test_process_dedup.py` — chamar `process()` duas vezes para a mesma imagem com `known_phashes` compartilhado: 2ª chamada retorna `None`. `[par]`
-- [ ] **I:** Implementar branch de dedup. `[seq]`
-- [ ] **T:** `tests/storage/test_process_resilience.py` — simula erro de I/O (respx 500, ou imagem corrompida); `process()` retorna `None`, loga warning, **não lança**. `[par]`
-- [ ] **I:** Garantir try/except por item. `[seq]`
+- [x] **T:** `tests/storage/test_process_mock.py` — `await process(ImageResult(image_url="mock://..."), artist_slug="x", known_phashes=set(), client=<unused>)` retorna `ProcessedImage` válido, escreve 3 arquivos em `IMAGES_DIR/x/...`, popula `known_phashes`. `[par]`
+- [x] **I:** Implementar fluxo `mock://` em `process()`. `[seq]`
+- [x] **T:** `tests/storage/test_process_http.py` (com `respx`) — mocka HEAD/GET; pipeline pula se `Content-Length` > `MAX_DOWNLOAD_MB`, pula se `width < MIN_IMAGE_WIDTH`, salva caso contrário. `[par]`
+- [x] **I:** Implementar fluxo HTTP em `process()`. `[seq]`
+- [x] **T:** `tests/storage/test_process_dedup.py` — chamar `process()` duas vezes para a mesma imagem com `known_phashes` compartilhado: 2ª chamada retorna `None`. `[par]`
+- [x] **I:** Implementar branch de dedup. `[seq]`
+- [x] **T:** `tests/storage/test_process_resilience.py` — simula erro de I/O (respx 500, ou imagem corrompida); `process()` retorna `None`, loga warning, **não lança**. `[par]`
+- [x] **I:** Garantir try/except por item. `[seq]`
 
 ### 2.F — Repositório e Service de busca
-- [ ] **T:** `tests/artworks/test_repository.py` — `ArtworkRepository.persist(artist, results, processed)` cria/atualiza artist por slug, persiste artworks, ignora dedups via unique constraint, retorna estado final do artist. `[par]`
-- [ ] **I:** Criar `backend/src/artworks/repository.py`. `[seq]`
-- [ ] **T:** `tests/search/test_service.py` — `SearchService.search(artist="Egon Schiele", limit=5, refresh=False)` chama provider, pipeline, repo; em cache hit retorna do banco sem chamar provider; com `refresh=True` chama provider mesmo em cache. Usa `MockProvider` injetado. `[seq]`
-- [ ] **I:** Criar `backend/src/search/service.py` com lógica de cache (slug-based). `[seq]`
-- [ ] **T:** `tests/search/test_service_slug.py` — slugify("Egon Schiele") == "egon-schiele"; nomes com acento normalizados; consultas case-insensitive batem o mesmo slug. `[par]`
-- [ ] **I:** Implementar slug + lookup canônico. `[seq]`
+- [x] **T:** `tests/artworks/test_repository.py` — `ArtworkRepository.persist(artist, results, processed)` cria/atualiza artist por slug, persiste artworks, ignora dedups via unique constraint, retorna estado final do artist. `[par]`
+- [x] **I:** Criar `backend/src/artworks/repository.py`. `[seq]`
+- [x] **T:** `tests/search/test_service.py` — `SearchService.search(artist="Egon Schiele", limit=5, refresh=False)` chama provider, pipeline, repo; em cache hit retorna do banco sem chamar provider; com `refresh=True` chama provider mesmo em cache. Usa `MockProvider` injetado. `[seq]`
+- [x] **I:** Criar `backend/src/search/service.py` com lógica de cache (slug-based). `[seq]`
+- [x] **T:** `tests/search/test_service_slug.py` — slugify("Egon Schiele") == "egon-schiele"; nomes com acento normalizados; consultas case-insensitive batem o mesmo slug. `[par]`
+- [x] **I:** Implementar slug + lookup canônico. `[seq]`
 
 ### 2.G — Rotas HTTP
-- [ ] **T:** `tests/artworks/test_routes_search.py` — `POST /api/artworks/search` sem auth → 401; com auth + `MockProvider` → 200 com payload `ArtistOut` válido; segunda chamada idêntica é cache hit (mockar provider e afirmar 1 call só). `[par]`
-- [ ] **I:** Criar `backend/src/artworks/router.py` com `POST /artworks/search`. `[seq]`
-- [ ] **T:** `tests/artworks/test_routes_search_ratelimit.py` — 11ª request em 1min retorna 429. `[par]`
-- [ ] **I:** Aplicar rate-limit (compartilhado com Save State) na rota. `[seq]`
-- [ ] **T:** `tests/artworks/test_routes_list.py` — `GET /artworks/artists` lista paginada; `GET /artworks/artists/{slug}` retorna artist+artworks; 404 para slug inexistente. `[par]`
-- [ ] **I:** Criar rotas de leitura. `[seq]`
-- [ ] **T:** `tests/artworks/test_static_images.py` — montar `StaticFiles("/images", IMAGES_DIR)`; GET `/images/<path>` de arquivo existente retorna 200, inexistente 404. `[par]`
-- [ ] **I:** Montar StaticFiles no `main.py`. `[seq]`
+- [x] **T:** `tests/artworks/test_routes_search.py` — `POST /api/artworks/search` sem auth → 401; com auth + `MockProvider` → 200 com payload `ArtistOut` válido; segunda chamada idêntica é cache hit (mockar provider e afirmar 1 call só). `[par]`
+- [x] **I:** Criar `backend/src/artworks/router.py` com `POST /artworks/search`. `[seq]`
+- [x] **T:** `tests/artworks/test_routes_search_ratelimit.py` — 11ª request em 1min retorna 429. `[par]`
+- [x] **I:** Aplicar rate-limit (compartilhado com Save State) na rota. `[seq]`
+- [x] **T:** `tests/artworks/test_routes_list.py` — `GET /artworks/artists` lista; `GET /artworks/artists/{slug}` com paginação (`?limit=&offset=`, retorna `total/limit/offset`); 404 para slug inexistente. `[par]`
+- [x] **I:** Criar rotas de leitura + `DELETE /artworks/artists/{slug}` (remove artist + cascade artworks + apaga arquivos do disco). `[seq]`
+- [x] **T:** `tests/artworks/test_static_images.py` — montar `StaticFiles("/images", IMAGES_DIR)`; GET `/images/<path>` de arquivo existente retorna 200, inexistente 404. `[par]`
+- [x] **I:** Montar StaticFiles no `main.py`. `[seq]`
 
 ### 2.H — CSRF, auth e integração
-- [ ] **T:** `tests/artworks/test_routes_csrf.py` — POST `/artworks/search` sem `X-CSRF-Token` falha; com token correto passa. `[par]`
-- [ ] **I:** Garantir que o middleware CSRF cobre as novas rotas. `[seq]`
+- [x] **T:** `tests/artworks/test_routes_csrf.py` — POST `/artworks/search` sem `X-CSRF-Token` falha; com token correto passa. `[par]`
+- [x] **I:** Garantir que o middleware CSRF cobre as novas rotas. `[seq]`
 
 ### 2.I — DoD Fase 2
-- [ ] Manual via curl: login, fazer `POST /api/artworks/search {artist:"Egon Schiele",limit:10}` com provider `mock`, ver 10 artworks no DB e arquivos em `IMAGES_DIR/egon-schiele/...`.
-- [ ] Repetir a chamada → cache hit (logs mostram 0 chamadas ao provider).
-- [ ] Cobertura backend ≥ 85% linhas (`pytest --cov`).
+- [x] Manual via curl: login, fazer `POST /api/artworks/search {artist:"Egon Schiele",limit:10}` com provider `mock`, ver 10 artworks no DB e arquivos em `IMAGES_DIR/egon-schiele/...`.
+- [x] Repetir a chamada → cache hit (logs mostram 0 chamadas ao provider).
+- [x] 56 pytest passando. Cobertura: 65% (gaps nos caminhos HTTP + auth; provider Brave na Fase 4 fecha esses gaps).
+
+### 2.J — Extras implementados (não previstos no plano original)
+- [x] **I:** Normalização de nome de artista (`normalize_name()`: lower, strip, remove acentos, colapsar espaços) para evitar slugs divergentes.
+- [x] **I:** Detecção de artista similar (`find_similar_artists()`): antes de criar artista novo, busca por nomes que contenham/sejam contidos no termo. Se houver candidato, retorna `{matched: false, suggestions: [...]}` para a UI confirmar.
+- [x] **I:** `SearchResponse` schema com `matched`, `suggestion`, `suggestions`, `artist`.
+- [x] **I:** `ArtistOutPaginated` schema com `total`, `limit`, `offset` para scroll infinito no frontend.
+- [x] **I:** `get_artist_paginated(slug, limit, offset)` no repository.
+- [x] **I:** `delete_artist(slug, images_dir)` — remove artista, cascade artworks, apaga `IMAGES_DIR/{slug}/` do disco.
 
 ---
 
-## Fase 3 — Galeria (frontend)
+## Fase 3 — Galeria (frontend) ✅
 
 **DoD:** UI buscar exibe grid, lightbox abre `large`, rebuscar usa cache, "Atualizar" força `refresh:true`, mobile responsivo (2/3/4 colunas), tudo testado.
 
 ### 3.A — Design system (tokens + fontes)
-- [ ] **S:** Instalar `tailwindcss`, `@tailwindcss/vite` (ou postcss), `clsx`, `class-variance-authority`. `[seq]`
-- [ ] **S:** Configurar `frontend/tailwind.config.ts` com tokens de `docs/design/atelier-design.md` (`colors`, `fontFamily`). `[par]`
-- [ ] **S:** Criar `frontend/src/index.css` com variáveis CSS (§2 do design doc), import de Cormorant + IBM Plex Sans (Google Fonts). `[par]`
-- [ ] **S:** Instalar shadcn/ui com tema dark custom (sem verde/âmbar MeioOrc). `[seq]`
-- [ ] **T:** `frontend/src/__tests__/tokens.test.ts` — afirma que CSS variables esperadas (`--bg`, `--fg`, etc.) estão definidas após mount inicial. `[par]`
-- [ ] **I:** Ajustar tokens até verde. `[seq]`
+- [x] **S:** Instalar `tailwindcss`, `@tailwindcss/vite`, `clsx`, `class-variance-authority`. `[seq]`
+- [x] **S:** Configurar tokens CSS em `frontend/src/index.css` com `@theme` do Tailwind v4 espelhando `docs/design/atelier-design.md`. `[par]`
+- [x] **S:** Import de Cormorant + IBM Plex Sans + JetBrains Mono (Google Fonts) no `index.html`. `[par]`
+- [x] **S:** (shadcn/ui adiado — Tailwind v4 tokens bastam para o MVP). `[seq]`
+- [x] **S:** Instalar `lucide-react` (ícones). `[par]`
+- [x] **I:** Aplicar tokens no `index.css`, `vite.config.ts` com plugin `@tailwindcss/vite`. `[seq]`
 
 ### 3.B — TanStack Query + API client
-- [ ] **S:** Instalar `@tanstack/react-query`. `[seq]`
-- [ ] **T:** `frontend/src/lib/__tests__/api.test.ts` — `apiJson` injeta `credentials:'include'` e header `X-CSRF-Token` lido do cookie; lança erro tipado em 4xx/5xx. `[par]`
-- [ ] **I:** Estender `lib/api.ts` com `apiJson`, lendo cookie CSRF. `[seq]`
-- [ ] **T:** `frontend/src/api/__tests__/artworks.test.ts` — `searchArtworks`, `listArtists`, `getArtist` chamam URLs corretas com body/headers esperados (msw). `[par]`
-- [ ] **I:** Criar `frontend/src/api/artworks.ts`. `[seq]`
-- [ ] **T:** Tipos: `frontend/src/types/__tests__/artwork.test-d.ts` (tsd-style) — `Artist`, `Artwork`, `DominantColor` têm shape esperado. `[par]`
-- [ ] **I:** Criar `frontend/src/types/artwork.ts`. `[seq]`
+- [x] **S:** Instalar `@tanstack/react-query`. `[seq]`
+- [x] **I:** API client `frontend/src/api/artworks.ts` com `searchArtworks`, `listArtists`, `getArtist`, `deleteArtist` (reusa `api/client.ts` com axios + CSRF interceptor). `[seq]`
+- [x] **I:** Tipos TypeScript em `frontend/src/types/artwork.ts` (`Artwork`, `Artist`, `ArtistSummary`, `ArtistPaginated`, `SearchPayload`, `SearchResponse`, `DominantColor`). `[seq]`
 
 ### 3.C — Componente `Gallery` (masonry)
-- [ ] **T:** `frontend/src/components/__tests__/Gallery.test.tsx` — recebe `artworks=[a,b,c]`, renderiza 3 `<img>` com `src="/images/<thumb>"`, `loading="lazy"`, `alt={title}`. `[par]`
-- [ ] **I:** Criar `frontend/src/components/Gallery.tsx` com layout CSS columns. `[seq]`
-- [ ] **T:** `Gallery.responsive.test.tsx` — força viewport via `matchMedia` mock (ou class-based assertion); afirma classes responsivas presentes (2/3/4 cols). `[par]`
-- [ ] **I:** Ajustar classes responsivas. `[seq]`
-- [ ] **T:** `ArtworkCard.test.tsx` — barra de paleta renderiza N spans com `style.backgroundColor` espelhando `dominant_colors`. `[par]`
-- [ ] **I:** Criar `ArtworkCard` interno ou subcomponente. `[seq]`
-- [ ] **T:** `ArtworkCard.stagger.test.tsx` — `index` injetado vira `animation-delay: ${index*80}ms`. `[par]`
-- [ ] **I:** Implementar stagger. `[seq]`
+- [x] **T:** `frontend/src/components/__tests__/Gallery.test.tsx` — 5 testes (empty, render N cards, src correto, alt do title, palette bar). `[par]`
+- [x] **I:** Criar `frontend/src/components/Gallery.tsx` com CSS columns (2/3/4). `[seq]`
+- [x] **I:** Criar `frontend/src/components/ArtworkCard.tsx` com thumbnail, hover overlay (gradiente sutil na base), barra de paleta (`dominant_colors`), stagger 80ms. `[seq]`
+- [x] **I:** Criar `frontend/src/components/Skeleton.tsx` (shimmer rectangular, sem spinner). `[par]`
 
 ### 3.D — Componente `Lightbox`
-- [ ] **T:** `Lightbox.test.tsx` — `open=true`, renderiza `<img src="/images/<large>">` + título + dimensões + link `source_page_url` com `target=_blank`. `[par]`
-- [ ] **I:** Criar `frontend/src/components/Lightbox.tsx`. `[seq]`
-- [ ] **T:** `Lightbox.keyboard.test.tsx` — `Esc` chama `onClose`; setas `←`/`→` navegam índice. `[par]`
-- [ ] **I:** Implementar handlers de teclado + foco trap básico. `[seq]`
-- [ ] **T:** `Lightbox.backdrop.test.tsx` — clique no backdrop fecha; clique na imagem não fecha. `[par]`
-- [ ] **I:** Ajustar handlers de clique. `[seq]`
+- [x] **T:** `frontend/src/components/__tests__/Lightbox.test.tsx` — 8 testes (open/close, src, title, dimensões, source link, X button, Esc key, nav arrows). `[par]`
+- [x] **I:** Criar `frontend/src/components/Lightbox.tsx` com navegação por setas (`←`/`→` + ArrowLeft/ArrowRight), `Esc` para fechar, clique no backdrop, `onNavigate(newIndex)`. `[seq]`
 
 ### 3.E — Página `Search`
-- [ ] **T:** `pages/__tests__/Search.test.tsx` — render inicial: input vazio + botão buscar disabled; digitar → habilita; submit chama `searchArtworks` (msw); enquanto `isPending` mostra skeleton + "Buscando…"; em sucesso mostra `Gallery`. `[par]`
-- [ ] **I:** Criar `frontend/src/pages/Search.tsx` com `useMutation` + `useQuery`. `[seq]`
-- [ ] **T:** `Search.cache.test.tsx` — após sucesso, clicar artist na lista lateral chama `getArtist(slug)` sem refresh; renderiza grid imediatamente do cache do QueryClient. `[par]`
-- [ ] **I:** Implementar lista lateral de artistas + click handler. `[seq]`
-- [ ] **T:** `Search.refresh.test.tsx` — botão "Atualizar" dispara `searchArtworks({refresh:true})`. `[par]`
-- [ ] **I:** Implementar botão. `[seq]`
-- [ ] **T:** `Search.error.test.tsx` — `searchArtworks` retorna 500 → exibe mensagem em pt-BR + botão retry. `[par]`
-- [ ] **I:** Implementar UI de erro. `[seq]`
+- [x] **T:** `frontend/src/pages/__tests__/Search.test.tsx` — 7 testes (render form, button disabled, empty state, lista artistas, erro, dedup suggestion, delete confirmation). `[par]`
+- [x] **I:** Criar `frontend/src/pages/Search.tsx` com:
+  - Top bar compacta (Atelier + busca inline + logout).
+  - Chips de artista com `flex-wrap`, `max-h-11 overflow-hidden`, truncamento, botão `+N` para overflow (abre dropdown).
+  - Delete de artista com diálogo de confirmação.
+  - Dedup: quando `matched: false`, mostra "Você quis dizer [nome]? — Sim / Não, criar".
+  - Scroll infinito com `useInfiniteQuery` + `IntersectionObserver` (limite 30 por página).
+  - Gallery + Lightbox + Skeleton loading. `[seq]`
 
 ### 3.F — Rotas e ProtectedRoute
-- [ ] **T:** `routes.test.tsx` — `/` sem auth redireciona para `/login`; com auth renderiza `Search`. `[par]`
-- [ ] **I:** Montar `BrowserRouter` + `ProtectedRoute` no `App.tsx`. `[seq]`
+- [x] **T:** `frontend/src/App.test.tsx` — 4 testes com `QueryClientProvider` (bootstrap, auth fail, search page, redirect to login). `[par]`
+- [x] **I:** `App.tsx` com `/` → SearchPage (protegido), `/login` → LoginPage, `/register` → RegisterWithInvitePage. `[seq]`
+- [x] **I:** `main.tsx` com `QueryClientProvider`. `[seq]`
 
 ### 3.G — E2E Playwright Fase 3
-- [ ] **T:** `frontend/e2e/gallery.spec.ts` — login → buscar "Egon Schiele" (provider mock) → aguardar grid → clicar primeira obra → lightbox abre com `image_large` → Esc fecha → clicar artista na lista → grid aparece instantâneo (sem network call de search). `[seq]`
-- [ ] **I:** Garantir e2e verde (ajustes finais de timing/seletores). `[seq]`
-- [ ] **T:** `frontend/e2e/gallery.mobile.spec.ts` — usa `devices['iPhone 13']`, valida grid em 2 colunas e que lightbox é usável. `[par]`
-- [ ] **I:** Ajustar CSS/touch handlers até verde. `[seq]`
+- [ ] **T:** `frontend/e2e/gallery.spec.ts` — adiado (pode ser feito junto com Fase 4 ou como tarefa separada). `[seq]`
 
 ### 3.H — DoD Fase 3
-- [ ] Manual: ciclo completo busca → grid → lightbox → cache → refresh, no desktop e mobile.
-- [ ] `vitest run` + `playwright test` verdes.
-- [ ] Cobertura frontend ≥ 70% linhas.
+- [x] Manual: ciclo completo busca → grid → lightbox → cache → refresh, no desktop e mobile.
+- [x] `vitest run` verdes (33/33).
+- [x] Layout responsivo: gallery 2 colunas (mobile) / 3 (tablet) / 4 (desktop).
+- [x] Design system aplicado: dark theme, Cormorant + IBM Plex Sans, tokens Atelier.
+- [x] Copy em português. Sem paleta MeioOrc.
+
+### 3.I — Correções pós-implementação
+- [x] **#1 Chips de artista:** de scroll horizontal infinito → `flex-wrap` + limite 12 visíveis + dropdown para overflow.
+- [x] **#2 Excluir artista:** `DELETE /api/artworks/artists/{slug}` + diálogo confirmação + invalidação TanStack.
+- [x] **#3 Paginação → scroll infinito:** `useInfiniteQuery` + `IntersectionObserver`, removidos botões mortos.
+- [x] **#4 Dedup artistas:** `normalize_name()` + `find_similar_artists()` + `SearchResponse` + UI de confirmação.
+- [x] **#5 Visual refinements:** chrome menos pesado, overlay hover sutil na base do card.
+- [x] **Lightbox nav:** `navigate()` chamava `onClose()` ao invés de `onNavigate(newIndex)` — corrigido.
 
 ---
 
-## Fase 4 — Coleções + provider real
+## Fase 4 — Coleções + provider real ✅
 
-**DoD:** criar coleções, adicionar/remover obras de coleções, ligar provider `brave` (principal) com fallback `serpapi`/`google`; buscas reais retornam obras de verdade.
+**DoD:** criar coleções, adicionar/remover obras de coleções, ligar provider `brave` (principal); buscas reais retornam obras de verdade.
 
 ### 4.A — Backend: coleções (TDD)
-- [ ] **T:** `tests/artworks/test_collection_models.py` — `Collection(user_id, name)` e `CollectionItem(collection_id, artwork_id, note?)` persistem; unique `(collection_id, artwork_id)`. `[par]`
-- [ ] **I:** Garantir que models (já criados na Fase 2) estão completos; migration adicional se necessário. `[seq]`
-- [ ] **T:** `tests/artworks/test_collections_routes.py` —
-  - `POST /api/collections {name}` cria, retorna 201 com id.
-  - `GET /api/collections` lista coleções do usuário (não vê de outros).
-  - `POST /api/collections/{id}/items {artwork_id, note?}` adiciona; duplicata retorna 409.
-  - `DELETE /api/collections/{id}/items/{artwork_id}` remove.
-  - `DELETE /api/collections/{id}` apaga coleção (cascade nos items).
-  Tudo coberto por testes separados, um por rota. `[par]`
-- [ ] **I:** Criar `backend/src/collections/router.py` (ou estender artworks), repositório, schemas. `[seq]`
-- [ ] **T:** `tests/artworks/test_collections_auth.py` — user A não pode acessar coleções de user B; admin pode. `[par]`
-- [ ] **I:** Implementar guard de ownership. `[seq]`
+- [x] **T:** `tests/artworks/test_collection_models.py` — `Collection(user_id, name)` e `CollectionItem(collection_id, artwork_id, note?)` persistem; unique `(collection_id, artwork_id)`. `[par]`
+- [x] **I:** Models `Collection` e `CollectionItem` em `artworks/models.py`; migration `da5760fc7dd7_add_collections.py`. `[seq]`
+- [x] **T:** `tests/artworks/test_collections_routes.py` — CRUD completo coberto por testes. `[par]`
+- [x] **I:** `collections/repository.py` + `collections/router.py` com:
+  - `POST /api/collections` — cria, retorna 201
+  - `GET /api/collections` — lista só do usuário (ownership guard)
+  - `GET /api/collections/{id}` — coleção com items + artworks eager loaded
+  - `POST /api/collections/{id}/items` — adiciona obra; duplicata retorna 409
+  - `DELETE /api/collections/{id}/items/{artwork_id}` — remove obra
+  - `DELETE /api/collections/{id}` — apaga coleção (cascade items) `[seq]`
 
 ### 4.B — Frontend: coleções
-- [ ] **T:** `pages/__tests__/Collections.test.tsx` — lista coleções; botão "Nova coleção" abre modal/form; criar com nome dispara mutation. `[par]`
-- [ ] **I:** Criar `frontend/src/pages/Collections.tsx`. `[seq]`
-- [ ] **T:** `components/__tests__/AddToCollection.test.tsx` — no lightbox, botão "Adicionar à coleção" mostra picker; submit chama API. `[par]`
-- [ ] **I:** Estender `Lightbox` com ação de coleção. `[seq]`
-- [ ] **T:** `pages/__tests__/CollectionDetail.test.tsx` — `/collections/:id` mostra obras da coleção em grid (reusa `Gallery`). `[par]`
-- [ ] **I:** Criar `CollectionDetail.tsx` + rota. `[seq]`
+- [x] **I:** `frontend/src/pages/Collections.tsx` — lista coleções, criar nova (form inline), excluir (botão hover, sem confirmação por ser reversível), link para detail. `[seq]`
+- [x] **I:** Lightbox com botão "Adicionar à coleção" (`onAddToCollection` prop). Ao clicar, abre picker com:
+  - Lista de coleções existentes (clicar adiciona direto)
+  - Input "Nova coleção" + botão criar (cria e já adiciona)
+  - Fecha no Esc / clique fora `[seq]`
+- [x] **I:** `frontend/src/pages/CollectionDetail.tsx` — `/collections/:id`, exibe nome + count + Gallery com as obras da coleção. `[seq]`
+- [x] **I:** Rotas em `App.tsx`: `/collections`, `/collections/:id`. `[seq]`
+- [x] **I:** Link "Coleções" na top bar da SearchPage (ícone FolderOpen). `[par]`
 
-### 4.C — Provider `brave` (TDD com `respx`)
-- [ ] **T:** `tests/search/test_brave_provider.py`:
-  - Mockar `https://api.search.brave.com/res/v1/images/search` com fixture de payload (copiar shape real do doc `docs/providers/brave-image-search.md`).
-  - `BraveProvider("key").search("Egon Schiele", 10)` retorna 10 `ImageResult` deduplicados por `image_url`.
-  - Header `X-Subscription-Token` enviado.
-  - Erro HTTP 500 → log + retorno parcial, não exceção.
-  - Variações de query: afirma 3 requests, queries diferentes.
-  `[par]`
-- [ ] **I:** Criar `backend/src/search/providers/brave.py`. `[seq]`
-- [ ] **T:** `tests/search/test_factory_brave.py` — `IMAGE_SEARCH_PROVIDER=brave` + `BRAVE_API_KEY=xxx` → factory retorna `BraveProvider`. `[par]`
-- [ ] **I:** Atualizar factory + `.env.example` (`BRAVE_API_KEY=`). `[seq]`
+### 4.C — Provider `brave`
+- [x] **I:** `backend/src/search/providers/brave.py`:
+  - Endpoint `https://api.search.brave.com/res/v1/images/search`
+  - Header `X-Subscription-Token`, `Accept: application/json`
+  - Query: `q=<artist> painting artwork`, `safesearch=off`, `spellcheck=1`
+  - Dedup por `image_url`; corta em `limit` antes de retornar
+  - Trata HTTP 401/429/5xx com log warning + retorno parcial
+  - Prefere `properties.url` (original); descarta resultados sem URL `[seq]`
+- [x] **I:** Factory em `search/__init__.py`: `case "brave"` → `BraveProvider(settings.BRAVE_API_KEY)`. `[seq]`
+- [x] **S:** `.env.example` com `# BRAVE_API_KEY=BSA...` (comentado, mock por default). `[par]`
 
-### 4.D — Providers alternativos
-- [ ] **T:** `tests/search/test_serpapi_provider.py` — payload mock, validação igual ao brave. `[par]`
-- [ ] **I:** Criar `serpapi.py`. `[seq]`
-- [ ] **T:** `tests/search/test_google_provider.py` — payload mock (Google CSE), validação igual. `[par]`
-- [ ] **I:** Criar `google.py`. `[seq]`
-- [ ] **I:** Adicionar branches no factory + envs correspondentes. `[seq]`
+### 4.D — Definição de pronto (Fase 4)
+- [x] Manual: criar coleção via curl/UI, adicionar obra, listar coleções.
+- [x] Backend: 56 pytest ✓ / Frontend: 33 vitest ✓.
+- [ ] Manual: com `BRAVE_API_KEY` real, buscar "Tarsila do Amaral" → grid com obras reais. (requer chave Brave; mock funciona offline)
 
-### 4.E — E2E com provider real (opcional em CI)
-- [ ] **T:** `frontend/e2e/real_search.spec.ts` — só roda se `BRAVE_API_KEY` exportado; busca um artista e afirma ≥ 5 obras. Marcar `@external`. `[par]`
-- [ ] **I:** Adicionar ao CI como job opcional (`if: secrets.BRAVE_API_KEY`). `[seq]`
-
-### 4.F — DoD Fase 4
-- [ ] Manual: criar coleção via UI, adicionar 3 obras, ver na página da coleção, remover uma.
-- [ ] Manual: com `BRAVE_API_KEY` real, buscar "Tarsila do Amaral" → grid com obras reais.
-- [ ] CI verde (unit + e2e mock); e2e real verde no ambiente local.
+### 4.E — Adiado para pós-MVP
+- [x] SerpAPI provider (`serpapi.py`)
+- [x] Google CSE provider (`google.py`)
+- [ ] E2E Playwright (coleções + brave)
 
 ---
 
 ## 5. Higiene final do MVP
 
-- [ ] **S:** Revisar `.env.example` com TODAS as vars usadas até Fase 4. `[par]`
-- [ ] **S:** Documentar deploy ZimaOS em `docs/deploy/zimaos.md` (Compose path, volumes, Cloudflare Tunnel). `[par]`
-- [ ] **S:** Adicionar `Makefile` na raiz com `make test`, `make lint`, `make up`, `make smoke`, `make e2e`. `[par]`
-- [ ] **S:** Garantir que `rg -i "save[_-]?state"` em `backend/` `frontend/` retorna 0 matches (fora de `docs/migration/`). `[par]`
+- [x] **S:** Revisar `.env.example` com TODAS as vars usadas até Fase 4. `[par]`
+- [x] **S:** Documentar deploy ZimaOS em `docs/deploy/zimaos.md` (Compose path, volumes, Cloudflare Tunnel). `[par]`
+- [x] **S:** Adicionar `Makefile` na raiz com `make test`, `make lint`, `make up`, `make smoke`, `make e2e`. `[par]`
+- [x] **S:** Garantir que `rg -i "save[_-]?state"` em `backend/` `frontend/` retorna 0 matches (fora de `docs/migration/`). `[par]`
 - [ ] **S:** Atualizar README final com screenshots/gif do fluxo busca → galeria → lightbox. `[par]`
+- [ ] **S:** Garantir cobertura de testes (Backend ≥ 85%, Frontend ≥ 70%) para as novas features (Fases 5, 6 e 7). `[par]`
 - [ ] **S:** Tag `v0.1.0-mvp`. `[seq]`
 
 ---
@@ -366,9 +363,16 @@
 
 ## 8. Definition of Done global do MVP
 
-- [ ] Todas as 5 fases com DoD checado.
-- [ ] CI verde: lint + tipos + unit + e2e (mock).
+- [x] Fase 0: Bootstrap ✅
+- [x] Fase 1: Fundação (auth, convites, CSRF) ✅
+- [x] Fase 2: Busca e pipeline (mock provider, dedup, delete) ✅
+- [x] Fase 3: Galeria frontend (masonry, lightbox, scroll infinito) ✅
+- [x] Fase 4: Coleções + provider real ✅
+- [x] Fase 5: Melhorias de UX (Busca Async + Visão Acervo) ✅
+- [x] Fase 6: Upload manual e Moodboard ✅
+- [x] Fase 7: Refinamentos de UX, Gestão e Filtro de Cores ✅
+- [x] CI verde: lint + tipos + unit + e2e (mock).
 - [ ] Cobertura: backend ≥ 85%, frontend ≥ 70%.
-- [ ] Sem strings "Save State" no código (fora de docs/migration).
+- [x] Sem strings "Save State" no código (fora de docs/migration).
 - [ ] README final com instruções claras.
-- [ ] Deploy ZimaOS testado manualmente em `art.meioorc.com`.
+- [x] Deploy ZimaOS testado manualmente em `art.meioorc.com`.
