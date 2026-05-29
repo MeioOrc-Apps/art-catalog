@@ -46,7 +46,7 @@ services:
 x-casaos:
   author: sergio.sousa
   category: Media
-  icon: https://raw.githubusercontent.com/sergio-sousa/art-catalog/main/docs/design/icon.png
+  icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/gallery.png
   title:
     custom: Art Catalog
     en_us: Art Catalog

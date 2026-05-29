@@ -1,12 +1,15 @@
 # Art Catalog
 
-Catálogo pessoal de referências artísticas e moodboard. Você digita o nome de um artista; a aplicação busca obras na web, processa as imagens (3 versões + paleta de cores + phash) e exibe numa galeria masonry. Conta também com upload manual de imagens, organização por coleções, filtro global por paleta de cores e um moodboard interativo.
+<div align="center">
+  <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/gallery.png" alt="Art Catalog Icon" width="120" />
+  <p><em>Catálogo pessoal de referências artísticas e moodboard.</em></p>
+</div>
+
+Você digita o nome de um artista; a aplicação busca obras na web, processa as imagens (3 versões + paleta de cores + phash) e exibe numa galeria masonry. Conta também com upload manual de imagens, organização por coleções, filtro global por paleta de cores e um moodboard interativo.
 
 > **Self-hosted**, registro fechado por convite. Roda em Docker Compose no ZimaOS atrás de Cloudflare Tunnel.
 
-![Art Catalog Preview](https://via.placeholder.com/1200x600/18181b/d4a574?text=Art+Catalog+Preview)
-
-## Funcionalidades (MVP)
+## 🌟 Funcionalidades (MVP)
 
 - **Busca Automatizada:** Integração com Brave Search para baixar e processar obras de artistas automaticamente.
 - **Upload Manual:** Adicione imagens locais diretamente ao catálogo de um artista.
@@ -16,46 +19,87 @@ Catálogo pessoal de referências artísticas e moodboard. Você digita o nome d
 - **Gestão de Usuários:** Painel Admin para controle de convites, ativação de contas e atribuição de cargos (Admin/Membro).
 - **Deduplicação Inteligente:** Usa `imagehash` (phash) para evitar imagens repetidas no banco.
 
-## Documentação Interna
-
-- **[PRD.md](./PRD.md)** — especificação completa (fonte de verdade).
-- **[AGENTS.md](./AGENTS.md)** — guia para agentes de IA (Cursor, Claude Code, Codex, Copilot…).
-- **[PLANO_DE_IMPLEMENTACAO.md](./PLANO_DE_IMPLEMENTACAO.md)** — roadmap e checklist de desenvolvimento.
-- **[docs/design/atelier-design.md](./docs/design/atelier-design.md)** — design system (spec única).
-
-## Stack
+## 🛠️ Stack Tecnológico
 
 - **Backend:** FastAPI + SQLAlchemy 2.0 async + PostgreSQL · Pillow + colorthief + imagehash
 - **Frontend:** React + Vite + TypeScript + Tailwind CSS v4 + TanStack Query · react-rnd (Moodboard)
-- **Infra:** Docker Compose · Cloudflare Tunnel
+- **Infra:** Docker Compose · Cloudflare Tunnel · GitHub Actions (GHCR)
 
-## Como rodar localmente
+---
 
-### 1. Desenvolvimento (Docker Compose)
+## 💻 Como rodar localmente para Desenvolvimento
+
+Se você deseja modificar o código ou testar localmente na sua máquina:
+
+### 1. Requisitos
+- [Docker](https://docs.docker.com/get-docker/) e [Docker Compose](https://docs.docker.com/compose/install/) instalados.
+- Git.
+
+### 2. Passos
 
 ```bash
-# 1. Copie o arquivo de variáveis de ambiente
+# Clone o repositório
+git clone https://github.com/SergioSJS/art-catalog.git
+cd art-catalog
+
+# Copie o arquivo de variáveis de ambiente
 cp .env.example .env
+# (Opcional) Edite o .env para adicionar suas chaves de API (ex: Brave Search)
 
-# 2. Suba os containers
+# Suba os containers em modo detached (segundo plano)
 docker compose up -d --build
-
-# 3. Verifique se a API está de pé
-curl http://127.0.0.1:8000/api/health
-# → {"status":"ok","app":"Art Catalog"}
 ```
 
-O frontend estará disponível em `http://localhost:5173`.
+### 3. Acessando a Aplicação
+- **Frontend:** `http://localhost:5173`
+- **Backend API Docs (Swagger):** `http://localhost:8000/docs`
 
 O primeiro usuário admin será criado automaticamente com as credenciais definidas no `.env` (`FIRST_ADMIN_EMAIL` e `FIRST_ADMIN_PASSWORD`).
 
-Faça login, busque um artista, crie suas coleções e monte seus moodboards!
+### 4. Acompanhando os Logs e Comandos Úteis
 
-### 2. Implantação no ZimaOS / CasaOS
+Para debugar ou ver o que está acontecendo por baixo dos panos:
 
-O Art Catalog é compatível com ZimaOS e CasaOS. Você pode importá-lo como um "Custom App" usando o arquivo `docker-compose.zimaos.yml`.
+```bash
+# Ver logs de todos os containers em tempo real
+docker compose logs -f
 
-1. Vá até o painel do ZimaOS/CasaOS.
-2. Clique no ícone de `+` e selecione **Install a customized app**.
-3. Clique em **Import** e cole o conteúdo do arquivo `docker-compose.zimaos.yml` (ajuste as variáveis de ambiente como `JWT_SECRET`, `FIRST_ADMIN_EMAIL` e `FIRST_ADMIN_PASSWORD` antes de instalar).
-4. O ZimaOS lerá o bloco `x-casaos` e configurará o aplicativo automaticamente.
+# Ver logs apenas da API (Backend)
+docker compose logs -f api
+
+# Ver logs apenas do Frontend
+docker compose logs -f frontend
+
+# Parar a aplicação
+docker compose down
+
+# Parar a aplicação e apagar o banco de dados (Reset completo)
+docker compose down -v
+```
+
+---
+
+## 🚀 Implantação no ZimaOS / CasaOS
+
+O Art Catalog foi desenhado para rodar perfeitamente no seu servidor doméstico (ZimaOS/CasaOS). As imagens Docker são construídas automaticamente pelo GitHub Actions e hospedadas no GitHub Container Registry (GHCR).
+
+### Instalação via "Custom App"
+
+1. Acesse o painel do seu ZimaOS / CasaOS.
+2. Clique no ícone de `+` (Install a customized app).
+3. No canto superior direito, clique em **Import**.
+4. Cole o conteúdo do arquivo [`docker-compose.zimaos.yml`](./docker-compose.zimaos.yml) que está na raiz deste repositório.
+5. **Importante:** Antes de clicar em instalar, revise as variáveis de ambiente na interface do ZimaOS:
+   - `JWT_SECRET`: Mude para uma string segura e aleatória.
+   - `FIRST_ADMIN_EMAIL`: Seu email de login.
+   - `FIRST_ADMIN_PASSWORD`: Sua senha.
+6. Clique em **Install**. O ZimaOS fará o download das imagens do GHCR e o aplicativo aparecerá no seu painel com o ícone correto!
+
+---
+
+## 📚 Documentação Interna
+
+- **[PRD.md](./PRD.md)** — Especificação completa (fonte de verdade).
+- **[AGENTS.md](./AGENTS.md)** — Guia para agentes de IA (Cursor, Claude Code, Codex, Copilot…).
+- **[PLANO_DE_IMPLEMENTACAO.md](./PLANO_DE_IMPLEMENTACAO.md)** — Roadmap e checklist de desenvolvimento.
+- **[docs/design/atelier-design.md](./docs/design/atelier-design.md)** — Design system (spec única).
