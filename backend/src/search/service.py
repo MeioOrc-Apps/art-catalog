@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.artworks.repository import ArtworkRepository
 from src.artworks.schemas import ArtistOut, SearchResponse
-from src.core.database import async_session_maker
+from src.core import database
 from src.storage.images import process
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ async def perform_search_task(
     provider,
 ):
     logger.info("Starting background search task for %s", artist_slug)
-    async with async_session_maker() as session:
+    async with database.async_session_maker() as session:
         repo = ArtworkRepository(session)
         artist = await repo.get_artist_by_slug(artist_slug)
         if not artist:

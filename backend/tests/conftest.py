@@ -35,6 +35,7 @@ _sessionmaker = None
 @pytest_asyncio.fixture(scope="session")
 async def _setup_db():
     global _engine, _sessionmaker
+    print("SETUP DB RUNNING")
     admin_url = settings.DATABASE_URL
     admin_engine = create_async_engine(admin_url, echo=False, isolation_level="AUTOCOMMIT")
     async with admin_engine.connect() as conn:
@@ -47,8 +48,12 @@ async def _setup_db():
 
     _engine = create_async_engine(TEST_DATABASE_URL, echo=False)
     async with _engine.begin() as conn:
+        print("TABLES:", Base.metadata.tables.keys())
         await conn.run_sync(Base.metadata.create_all)
     _sessionmaker = async_sessionmaker(_engine, expire_on_commit=False)
+    from src.core import database
+    database.engine = _engine
+    database.async_session_maker = _sessionmaker
     yield
     async with _engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)

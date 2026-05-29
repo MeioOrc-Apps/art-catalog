@@ -57,7 +57,7 @@ async def _bootstrap_first_admin() -> None:
 
     from src.auth.models import User
     from src.core.config import settings
-    from src.core.database import async_session_maker
+    from src.core import database
 
     email = settings.FIRST_ADMIN_EMAIL
     password = settings.FIRST_ADMIN_PASSWORD
@@ -65,7 +65,7 @@ async def _bootstrap_first_admin() -> None:
     if not email or not password:
         return
 
-    async with async_session_maker() as session:
+    async with database.async_session_maker() as session:
         result = await session.execute(select(User).where(User.email == email))
         if result.scalar_one_or_none() is not None:
             logger.info("first_admin_already_exists", email=email)
