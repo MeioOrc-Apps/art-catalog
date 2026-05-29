@@ -33,7 +33,7 @@ services:
       FIRST_ADMIN_PASSWORD: ${FIRST_ADMIN_PASSWORD:-admin123}
       RATE_LIMITS_DISABLED: ${RATE_LIMITS_DISABLED:-true}
       COOKIE_SECURE: "false"
-      CORS_ORIGINS: '["http://localhost:5173","http://localhost:3000"]'
+      CORS_ORIGINS: "*"
       WATCHFILES_FORCE_POLLING: "true"
       IMAGE_SEARCH_PROVIDER: ${IMAGE_SEARCH_PROVIDER:-mock}
       BRAVE_API_KEY: ${BRAVE_API_KEY:-}

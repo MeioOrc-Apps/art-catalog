@@ -41,7 +41,7 @@ services:
       FIRST_ADMIN_PASSWORD: admin
       RATE_LIMITS_DISABLED: "false"
       COOKIE_SECURE: "true"
-      CORS_ORIGINS: '["*"]'
+      CORS_ORIGINS: "*"
       IMAGE_SEARCH_PROVIDER: brave
       BRAVE_API_KEY: "sua-chave-aqui"
     volumes:
