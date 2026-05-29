@@ -1,5 +1,7 @@
 import pytest
+
 from src.common.url_validator import validate_external_url
+
 
 def test_validate_external_url():
     assert validate_external_url("http://example.com/image.jpg") == "http://example.com/image.jpg"

@@ -1,10 +1,12 @@
+
 import pytest
+from fastapi_users.password import PasswordHelper
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.artworks.models import Artist, Artwork
 from src.auth.models import User
-from fastapi_users.password import PasswordHelper
-import uuid
+
 
 async def _create_and_login_user(async_client: AsyncClient, db_session: AsyncSession, email: str, role: str = "member"):
     pwd_helper = PasswordHelper()

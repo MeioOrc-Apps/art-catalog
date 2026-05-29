@@ -1,6 +1,7 @@
-import pytest
 from datetime import datetime
-from src.common.pagination import CursorPage, encode_cursor, decode_cursor
+
+from src.common.pagination import CursorPage, decode_cursor, encode_cursor
+
 
 def test_cursor_page():
     page = CursorPage(items=[1, 2, 3], next_cursor="abc", total=3)

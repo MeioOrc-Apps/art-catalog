@@ -6,7 +6,8 @@ import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import update
+from pydantic import BaseModel
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.invites import (
@@ -18,14 +19,11 @@ from src.auth.invites import (
     revoke_invite,
 )
 from src.auth.manager import UserManager, current_active_user, get_user_manager
-from pydantic import BaseModel
-from sqlalchemy import select
-from src.auth.models import User, Invite
+from src.auth.models import User
 from src.auth.schemas import (
     ForgotPasswordRequest,
     InviteCreate,
     InviteRead,
-    UserRead,
     MeUpdate,
     RegisterWithInviteRequest,
     ResetPasswordRequest,

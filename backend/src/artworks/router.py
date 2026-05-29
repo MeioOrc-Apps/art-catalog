@@ -1,25 +1,26 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, UploadFile, File
-from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
+
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Query, UploadFile
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.artworks.repository import ArtworkRepository
 from src.artworks.schemas import (
+    ArtistCreatePayload,
     ArtistOut,
     ArtistOutPaginated,
-    SearchPayload,
-    SearchResponse,
-    ArtistCreatePayload,
     ArtworkOut,
     ExploreOutPaginated,
+    SearchPayload,
+    SearchResponse,
 )
 from src.auth.manager import current_active_user
 from src.auth.models import User
 from src.core.config import settings
 from src.core.database import get_async_session
 from src.search import get_provider
+from src.search.base import ImageResult
 from src.search.service import SearchService
 from src.storage.images import process_raw_image
-from src.search.base import ImageResult
 
 router = APIRouter(prefix="/api/artworks", tags=["artworks"])
 

@@ -1,7 +1,9 @@
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.artworks.models import Collection, CollectionItem, Artist, Artwork
+
+from src.artworks.models import Artist, Artwork, Collection, CollectionItem
+
 
 @pytest.mark.asyncio
 async def test_create_collection(async_client: AsyncClient, db_session: AsyncSession):

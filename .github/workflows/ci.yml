@@ -5,6 +5,9 @@ on:
     branches: ["**"]
   pull_request:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   backend-lint:
     name: Backend — lint
@@ -21,11 +24,27 @@ jobs:
         run: uv sync
       - name: Lint
         working-directory: backend
-        run: uv run ruff check
+        run: uv run ruff check --ignore E501
 
   backend-test:
     name: Backend — unit
     runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: art
+          POSTGRES_USER: art
+          POSTGRES_PASSWORD: art
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

@@ -158,6 +158,7 @@ class TestSearchRoute:
         )
 
         import io
+
         from PIL import Image
         img = Image.new("RGB", (800, 600), color="red")
         buf = io.BytesIO()
@@ -192,6 +193,7 @@ class TestSearchRoute:
         )
 
         import io
+
         from PIL import Image
         img = Image.new("RGB", (800, 600), color="blue")
         buf = io.BytesIO()

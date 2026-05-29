@@ -10,6 +10,7 @@ env:
   # Use lowercase for Docker tags
   IMAGE_NAME_API: sergiosjs/art-catalog-api
   IMAGE_NAME_FRONTEND: sergiosjs/art-catalog-frontend
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-and-push:

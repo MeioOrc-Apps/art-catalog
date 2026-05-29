@@ -1,5 +1,5 @@
-import pytest
 from src.common.slugify import make_slug
+
 
 def test_make_slug():
     assert make_slug("Vincent van Gogh") == "vincent-van-gogh"

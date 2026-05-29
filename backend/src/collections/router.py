@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.artworks.schemas import (
     CollectionCreatePayload,
     CollectionItemAddPayload,
-    CollectionItemUpdatePayload,
     CollectionItemOut,
+    CollectionItemUpdatePayload,
     CollectionOut,
 )
 from src.auth.manager import current_active_user

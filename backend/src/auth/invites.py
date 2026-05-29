@@ -108,7 +108,7 @@ async def validate_and_consume_invite(
     `reserve_invite` + `attach_invite_to_user` for new code paths, since
     that is race-safe across concurrent requests.
     """
-    invite = await reserve_invite(session, code)
+    await reserve_invite(session, code)
     await attach_invite_to_user(session, code, used_by)
     return await get_invite_by_code(session, code)
 

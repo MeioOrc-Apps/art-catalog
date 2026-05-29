@@ -8,8 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.artworks.repository import ArtworkRepository
 from src.artworks.schemas import ArtistOut, SearchResponse
 from src.core.database import async_session_maker
-from src.search.base import ImageResult
-from src.storage.images import ProcessedImage, process
+from src.storage.images import process
 
 logger = logging.getLogger(__name__)
 
