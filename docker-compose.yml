@@ -1,0 +1,69 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-art}
+      POSTGRES_USER: ${POSTGRES_USER:-art}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-art}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-art}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-art}:${POSTGRES_PASSWORD:-art}@db:5432/${POSTGRES_DB:-art}
+      APP_NAME: ${APP_NAME:-Atelier}
+      ENV: ${ENV:-dev}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      IMAGES_DIR: /app/data/images
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-this-in-production-use-openssl}
+      FIRST_ADMIN_EMAIL: ${FIRST_ADMIN_EMAIL:-sergio@meioorc.com}
+      FIRST_ADMIN_PASSWORD: ${FIRST_ADMIN_PASSWORD:-admin123}
+      RATE_LIMITS_DISABLED: ${RATE_LIMITS_DISABLED:-true}
+      COOKIE_SECURE: "false"
+      CORS_ORIGINS: '["http://localhost:5173","http://localhost:3000"]'
+      WATCHFILES_FORCE_POLLING: "true"
+      IMAGE_SEARCH_PROVIDER: ${IMAGE_SEARCH_PROVIDER:-mock}
+      BRAVE_API_KEY: ${BRAVE_API_KEY:-}
+      SERPAPI_KEY: ${SERPAPI_KEY:-}
+      GOOGLE_CSE_KEY: ${GOOGLE_CSE_KEY:-}
+      GOOGLE_CSE_CX: ${GOOGLE_CSE_CX:-}
+    volumes:
+      - images:/app/data/images
+      - ./backend/src:/app/src
+      - ./backend/tests:/app/tests
+      - ./backend/pyproject.toml:/app/pyproject.toml
+      - ./backend/alembic:/app/alembic
+      - ./backend/alembic.ini:/app/alembic.ini
+    ports:
+      - "127.0.0.1:8000:8000"
+    command:
+      - sh
+      - -c
+      - "uv run alembic upgrade head && exec uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host"
+
+volumes:
+  pgdata:
+  images:

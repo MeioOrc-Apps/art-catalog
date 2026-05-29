@@ -12,6 +12,21 @@ venv/
 # Build output
 dist/
 build/
+frontend/dist/
+
+# Data cache
+backend/data/
+data/images/
+
+# Logs
+*.log
+
+# Testing
+.pytest_cache/
+.ruff_cache/
+coverage/
+.coverage
+backend/.coverage
 
 # IDE
 .idea/
