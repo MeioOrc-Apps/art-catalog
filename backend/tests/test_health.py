@@ -11,4 +11,4 @@ async def test_health_returns_status_and_app_name():
         response = await client.get("/api/health")
 
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "app": "Atelier"}
+    assert response.json() == {"status": "ok", "app": "Atelier", "version": "unknown"}

@@ -1,3 +1,4 @@
+import os
 import secrets
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -117,8 +118,6 @@ images_path = Path(settings.images_dir)
 images_path.mkdir(parents=True, exist_ok=True)
 app.mount("/images", StaticFiles(directory=str(images_path)), name="images")
 
-
-import os
 
 @app.get("/api/health")
 async def health() -> dict:
