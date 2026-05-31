@@ -118,6 +118,9 @@ images_path.mkdir(parents=True, exist_ok=True)
 app.mount("/images", StaticFiles(directory=str(images_path)), name="images")
 
 
+import os
+
 @app.get("/api/health")
 async def health() -> dict:
-    return {"status": "ok", "app": "Atelier"}
+    version = os.getenv("APP_VERSION", "unknown")
+    return {"status": "ok", "app": "Atelier", "version": version}
