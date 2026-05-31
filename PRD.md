@@ -261,11 +261,12 @@ DEFAULT_RESULTS_PER_SEARCH=30
 
 ## 12. Deploy no ZimaOS
 
-- Compose em `/var/lib/casaos/apps/art-reference/docker-compose.yml`.
-- Volume bind: `/DATA/AppData/art-reference/images:/app/data/images`.
+- Deploy realizado via **CasaOS Custom App Store** (repositório dedicado `casaos-appstore`).
+- O ZimaOS lê o `docker-compose.yml` da App Store, que aponta para as imagens publicadas no Docker Hub (`docker.io/sergiosjs/art-catalog-api` e `frontend`).
+- Volume bind: `/DATA/AppData/art-catalog/images:/app/data/images`.
 - Serviços: `db` (Postgres), `api` (FastAPI), `frontend` (build estático servido por Nginx).
 - Cloudflare Tunnel: `art` → `meioorc.com` → `HTTP localhost:{porta_frontend}`.
-- Atualização: `docker compose pull && docker compose up -d --force-recreate`.
+- Atualização: Gerenciada nativamente pela interface do ZimaOS/CasaOS através da App Store customizada, baseada em versionamento semântico (tags).
 
 ## 13. Roadmap por fases
 

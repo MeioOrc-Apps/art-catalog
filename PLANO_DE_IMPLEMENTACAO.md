@@ -324,7 +324,11 @@
 - [x] **S:** Garantir que `rg -i "save[_-]?state"` em `backend/` `frontend/` retorna 0 matches (fora de `docs/migration/`). `[par]`
 - [x] **S:** Atualizar README final com instruções ZimaOS e screenshots pendentes. `[par]`
 - [x] **S:** Garantir cobertura de testes (Backend e Frontend) para as novas features (Fases 5, 6 e 7). `[par]`
-- [ ] **S:** Tag `v0.1.0-mvp`. `[seq]`
+- [x] **S:** Tag `v0.1.0-mvp` (e subsequentes até `v0.1.14`). `[seq]`
+- [ ] **T:** Aumentar cobertura de testes do backend para ≥ 85%. `[par]`
+- [ ] **T:** Aumentar cobertura de testes do frontend para ≥ 70%. `[par]`
+- [ ] **T:** Implementar testes E2E com Playwright (fluxos críticos: auth, busca, galeria, coleções). `[par]`
+- [ ] **S:** Atualizar `README.md` final com screenshots/GIFs reais da aplicação em funcionamento. `[par]`
 
 ---
 
@@ -373,6 +377,7 @@
 - [x] Fase 7: Refinamentos de UX, Gestão e Filtro de Cores ✅
 - [x] CI verde: lint + tipos + unit + e2e (mock).
 - [ ] Cobertura: backend ≥ 85%, frontend ≥ 70%.
+- [ ] Testes E2E com Playwright implementados.
 - [x] Sem strings "Save State" no código (fora de docs/migration).
-- [ ] README final com instruções claras.
-- [x] Deploy ZimaOS testado manualmente em `art.meioorc.com`.
+- [ ] README final com instruções claras e screenshots.
+- [x] Deploy ZimaOS testado e funcional via CasaOS App Store customizada.
