@@ -16,6 +16,9 @@ jobs:
   backend-lint:
     name: Backend — lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -33,6 +36,9 @@ jobs:
   backend-test:
     name: Backend — unit
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     services:
       db:
         image: postgres:16-alpine
@@ -66,6 +72,9 @@ jobs:
   frontend-lint:
     name: Frontend — typecheck
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -83,6 +92,9 @@ jobs:
   frontend-test:
     name: Frontend — vitest
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -100,6 +112,9 @@ jobs:
   compose-smoke:
     name: Compose smoke test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - name: Run smoke test
