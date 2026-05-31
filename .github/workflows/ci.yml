@@ -141,6 +141,8 @@ jobs:
           push: true
           tags: ${{ steps.meta-api.outputs.tags }}
           labels: ${{ steps.meta-api.outputs.labels }}
+          build-args: |
+            APP_VERSION=${{ github.ref_name }}
 
       - name: Extract metadata (tags, labels) for Frontend
         id: meta-frontend
@@ -158,3 +160,5 @@ jobs:
           push: true
           tags: ${{ steps.meta-frontend.outputs.tags }}
           labels: ${{ steps.meta-frontend.outputs.labels }}
+          build-args: |
+            VITE_APP_VERSION=${{ github.ref_name }}
