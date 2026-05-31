@@ -9,8 +9,10 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   REGISTRY: ghcr.io
-  IMAGE_NAME_API: sergiosjs/art-catalog-api
-  IMAGE_NAME_FRONTEND: sergiosjs/art-catalog-frontend
+  GHCR_IMAGE_API: meioorc-apps/art-catalog-api
+  GHCR_IMAGE_FRONTEND: meioorc-apps/art-catalog-frontend
+  DOCKERHUB_IMAGE_API: sergiosjs/art-catalog-api
+  DOCKERHUB_IMAGE_FRONTEND: sergiosjs/art-catalog-frontend
 
 jobs:
   backend-lint:
@@ -151,8 +153,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_API }}
-            ${{ env.IMAGE_NAME_API }}
+            ${{ env.REGISTRY }}/${{ env.GHCR_IMAGE_API }}
+            ${{ env.DOCKERHUB_IMAGE_API }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=semver,pattern={{version}}
@@ -172,8 +174,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}
-            ${{ env.IMAGE_NAME_FRONTEND }}
+            ${{ env.REGISTRY }}/${{ env.GHCR_IMAGE_FRONTEND }}
+            ${{ env.DOCKERHUB_IMAGE_FRONTEND }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=semver,pattern={{version}}
