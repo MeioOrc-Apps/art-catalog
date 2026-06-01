@@ -391,19 +391,6 @@ export default function SearchPage() {
                   disabled={isProcessing || false}
                 />
               </div>
-              <div className="flex flex-col items-center shrink-0" title="Quantidade de imagens">
-                <input
-                  type="range"
-                  min={10}
-                  max={200}
-                  step={10}
-                  value={searchLimit}
-                  onChange={(e) => setSearchLimit(Number(e.target.value))}
-                  className="w-14 accent-[var(--color-accent)] cursor-pointer"
-                  aria-label="Limite de imagens"
-                />
-                <span className="text-[10px] text-muted-foreground leading-none mt-0.5 tabular-nums">{searchLimit}</span>
-              </div>
               <button
                 type="submit"
                 disabled={!query.trim() || isProcessing || false}
@@ -421,6 +408,7 @@ export default function SearchPage() {
               onClick={() => {
                 setActiveSlug(null); setSubmittedArtist(null); setQuery(''); setDedupSuggestion(null)
                 queryClient.removeQueries({ queryKey: ['artist-pages'] })
+                searchMutation.reset()
               }}
               className="font-display italic font-bold text-2xl tracking-tighter bg-gradient-to-r from-accent via-accent-gold to-accent-terracotta bg-clip-text text-transparent shrink-0 hover:opacity-80 transition-opacity"
             >
@@ -438,19 +426,6 @@ export default function SearchPage() {
                   className="w-full h-10 pl-8 pr-3 text-base rounded-sm border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
                   disabled={isProcessing || false}
                 />
-              </div>
-              <div className="flex flex-col items-center shrink-0" title="Quantidade de imagens a buscar">
-                <input
-                  type="range"
-                  min={10}
-                  max={200}
-                  step={10}
-                  value={searchLimit}
-                  onChange={(e) => setSearchLimit(Number(e.target.value))}
-                  className="w-16 accent-[var(--color-accent)] cursor-pointer"
-                  aria-label="Limite de imagens"
-                />
-                <span className="text-[10px] text-muted-foreground leading-none mt-0.5 tabular-nums">{searchLimit} imgs</span>
               </div>
               <button
                 type="submit"
@@ -579,11 +554,17 @@ export default function SearchPage() {
         {hasResults && (
           <div className="flex-1 flex flex-col">
             <div className="sticky top-14 z-40 bg-background/95 backdrop-blur-sm flex items-center justify-between px-4 py-2 border-b border-border flex-wrap gap-2">
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="font-display font-semibold text-lg text-foreground">{displayName}</h2>
                 <span className="text-base text-muted-foreground font-mono tabular-nums">
                   {displayTotal} obras
                 </span>
+                {isProcessing && (
+                  <span className="flex items-center gap-1.5 text-base text-accent font-medium px-2.5 py-1 rounded-sm bg-accent/10 border border-accent/20">
+                    <RefreshCw size={14} className="animate-spin shrink-0" />
+                    Buscando…
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -618,10 +599,25 @@ export default function SearchPage() {
                   <Upload size={14} />
                   {uploadMutation.isPending ? 'Enviando...' : 'Upload'}
                 </button>
-                <button type="button" className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-base text-foreground hover:text-accent hover:bg-card transition-colors" onClick={handleRefresh} disabled={isProcessing || false}>
-                  <RefreshCw size={14} />
-                  Atualizar
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <div className="flex flex-col items-center" title="Quantidade de imagens a buscar">
+                    <input
+                      type="range"
+                      min={10}
+                      max={200}
+                      step={10}
+                      value={searchLimit}
+                      onChange={(e) => setSearchLimit(Number(e.target.value))}
+                      className="w-16 accent-[var(--color-accent)] cursor-pointer"
+                      aria-label="Limite de imagens"
+                    />
+                    <span className="text-[10px] text-muted-foreground leading-none tabular-nums">{searchLimit} imgs</span>
+                  </div>
+                  <button type="button" className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-base text-foreground hover:text-accent hover:bg-card transition-colors" onClick={handleRefresh} disabled={isProcessing || false}>
+                    <RefreshCw size={14} />
+                    Atualizar
+                  </button>
+                </div>
               </div>
             </div>
             <div className="flex-1 p-3 md:p-4">

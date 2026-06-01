@@ -72,7 +72,7 @@ class BraveProvider(ImageSearchProvider):
             logger.warning("brave request failed (offset=%d): %s", offset, e)
             return []
 
-    async def search(self, query: str, limit: int = 30) -> list[ImageResult]:
+    async def search(self, query: str, limit: int = 30, start_offset: int = 0) -> list[ImageResult]:
         q = query if ("art" in query.lower()) else f"{query} +artstation"
         query_words = [w.lower() for w in query.split()]
 
@@ -80,9 +80,9 @@ class BraveProvider(ImageSearchProvider):
         seen_urls: set[str] = set()
 
         # Paginate through Brave results until we have enough or exhaust pages.
-        # Each page requests 2× what we still need (capped at 100) so filtering
-        # has room to discard low-quality results without running out.
-        offset = 0
+        # start_offset lets callers skip pages already seen (e.g. on refresh after
+        # N images were already downloaded from the top results).
+        offset = (start_offset // _PAGE_SIZE) * _PAGE_SIZE  # snap to page boundary
         max_offset = 450  # Brave typically supports up to 490
 
         async with httpx.AsyncClient(timeout=15) as client:

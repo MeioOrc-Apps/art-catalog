@@ -18,8 +18,9 @@ async def perform_search_task(
     artist_name: str,
     limit: int,
     provider,
+    start_offset: int = 0,
 ):
-    logger.info("Starting background search task for %s", artist_slug)
+    logger.info("Starting background search task for %s (offset=%d)", artist_slug, start_offset)
     async with database.async_session_maker() as session:
         repo = ArtworkRepository(session)
         artist = await repo.get_artist_by_slug(artist_slug)
@@ -28,10 +29,14 @@ async def perform_search_task(
 
         try:
             known_phashes = await repo.list_phashes_for_artist(artist.id)
-            results = await provider.search(artist_name, limit)
+            results = await provider.search(artist_name, limit, start_offset=start_offset)
             logger.info("got %d results for %s", len(results), artist_name)
 
-            async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
+            async with httpx.AsyncClient(
+                timeout=20,
+                follow_redirects=True,
+                headers={"User-Agent": "Mozilla/5.0 (compatible; ArtCatalogBot/1.0)"},
+            ) as client:
                 for r in results:
                     pi = await process(
                         r,
@@ -104,12 +109,21 @@ class SearchService:
             artist.sync_status = "processing"
             await self._session.commit()
 
+            # On refresh, start Brave pagination past results already downloaded
+            # so we surface genuinely new images instead of duplicates from page 1.
+            start_offset = 0
+            if refresh:
+                existing = await self._repo.get_artist_with_artworks(artist.slug)
+                if existing:
+                    start_offset = len(existing.artworks)
+
             self._background_tasks.add_task(
                 perform_search_task,
                 artist_slug=artist.slug,
                 artist_name=artist_name,
                 limit=limit,
                 provider=self._provider,
+                start_offset=start_offset,
             )
 
         artist_out = await self._repo.get_artist_with_artworks(artist.slug)

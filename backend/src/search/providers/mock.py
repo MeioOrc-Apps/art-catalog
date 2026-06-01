@@ -5,7 +5,7 @@ from src.search.base import ImageResult
 
 
 class MockProvider:
-    async def search(self, query: str, limit: int) -> list[ImageResult]:
+    async def search(self, query: str, limit: int, start_offset: int = 0) -> list[ImageResult]:
         seed = int(hashlib.md5(query.encode()).hexdigest(), 16) & 0xFFFFFFFF
         rng = random.Random(seed)
         results = []

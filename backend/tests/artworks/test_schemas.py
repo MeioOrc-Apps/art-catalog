@@ -17,16 +17,17 @@ class TestSearchPayload:
         with pytest.raises(ValidationError):
             SearchPayload(artist="")
 
-    def test_limit_range_1_to_100(self):
+    def test_limit_range_1_to_200(self):
         from src.artworks.schemas import SearchPayload
 
         assert SearchPayload(artist="X", limit=1).limit == 1
         assert SearchPayload(artist="X", limit=100).limit == 100
+        assert SearchPayload(artist="X", limit=200).limit == 200
 
         with pytest.raises(ValidationError):
             SearchPayload(artist="X", limit=0)
         with pytest.raises(ValidationError):
-            SearchPayload(artist="X", limit=101)
+            SearchPayload(artist="X", limit=201)
 
     def test_refresh_default_false(self):
         from src.artworks.schemas import SearchPayload

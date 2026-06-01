@@ -1,7 +1,7 @@
 """Tests for BraveProvider, focusing on the pagination logic."""
+import httpx
 import pytest
 import respx
-import httpx
 
 
 def _make_results(prefix: str, count: int, query: str = "monet art") -> list[dict]:

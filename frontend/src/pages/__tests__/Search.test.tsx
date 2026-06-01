@@ -124,55 +124,87 @@ describe('SearchPage', () => {
     })
   })
 
-  it('renders limit slider with default value of 30', () => {
-    renderWithQuery(<SearchPage />)
-    const slider = screen.getAllByLabelText('Limite de imagens')[0]
-    expect(slider).toBeInTheDocument()
-    expect((slider as HTMLInputElement).value).toBe('30')
-    expect(screen.getAllByText('30 imgs')[0]).toBeInTheDocument()
-  })
+  const mockArtwork = { id: 'a1', title: 'Monet A1', image_thumb: 't1', is_pinned: false, created_at: '2024-01-01' }
+  const artistWithArtworks = {
+    matched: true,
+    suggestion: null,
+    suggestions: [],
+    artist: {
+      id: '1',
+      slug: 'monet',
+      canonical_name: 'Monet',
+      last_searched_at: '2024-01-01',
+      sync_status: 'ready',
+      created_at: '2024-01-01',
+      artworks: [mockArtwork],
+      total: 1,
+      limit: 30,
+      offset: 0,
+    },
+  }
+  const pagedArtist = { ...artistWithArtworks.artist }
 
-  it('updates displayed count when slider changes', async () => {
-    renderWithQuery(<SearchPage />)
-    const slider = screen.getAllByLabelText('Limite de imagens')[0]
-    fireEvent.change(slider, { target: { value: '100' } })
-    await waitFor(() => {
-      expect(screen.getAllByText('100 imgs')[0]).toBeInTheDocument()
-    })
-  })
-
-  it('submits search with custom limit from slider', async () => {
-    mockSearchArtworks.mockResolvedValue({
-      matched: true,
-      suggestion: null,
-      suggestions: [],
-      artist: {
-        id: '1',
-        slug: 'monet',
-        canonical_name: 'Monet',
-        last_searched_at: null,
-        sync_status: 'ready',
-        created_at: '2024-01-01',
-        artworks: [],
-        total: 0,
-        limit: 100,
-        offset: 0,
-      },
-    })
+  it('renders limit slider in artist toolbar after search', async () => {
+    mockSearchArtworks.mockResolvedValue(artistWithArtworks)
+    mockGetArtist.mockResolvedValue(pagedArtist)
 
     const user = userEvent.setup()
     renderWithQuery(<SearchPage />)
-
-    const slider = screen.getAllByLabelText('Limite de imagens')[0]
-    fireEvent.change(slider, { target: { value: '100' } })
 
     const input = screen.getAllByPlaceholderText('Buscar artista…')[0]
     await user.type(input, 'Monet')
     await user.click(screen.getAllByLabelText('Buscar')[0])
 
     await waitFor(() => {
+      expect(screen.getByLabelText('Limite de imagens')).toBeInTheDocument()
+      expect((screen.getByLabelText('Limite de imagens') as HTMLInputElement).value).toBe('30')
+    })
+  })
+
+  it('updates displayed count when slider changes in artist toolbar', async () => {
+    mockSearchArtworks.mockResolvedValue(artistWithArtworks)
+    mockGetArtist.mockResolvedValue(pagedArtist)
+
+    const user = userEvent.setup()
+    renderWithQuery(<SearchPage />)
+
+    const input = screen.getAllByPlaceholderText('Buscar artista…')[0]
+    await user.type(input, 'Monet')
+    await user.click(screen.getAllByLabelText('Buscar')[0])
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Limite de imagens')).toBeInTheDocument()
+    })
+
+    fireEvent.change(screen.getByLabelText('Limite de imagens'), { target: { value: '100' } })
+    await waitFor(() => {
+      expect(screen.getByText('100 imgs')).toBeInTheDocument()
+    })
+  })
+
+  it('uses slider limit when clicking Atualizar', async () => {
+    mockSearchArtworks.mockResolvedValue(artistWithArtworks)
+    mockGetArtist.mockResolvedValue(pagedArtist)
+
+    const user = userEvent.setup()
+    renderWithQuery(<SearchPage />)
+
+    const input = screen.getAllByPlaceholderText('Buscar artista…')[0]
+    await user.type(input, 'Monet')
+    await user.click(screen.getAllByLabelText('Buscar')[0])
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Limite de imagens')).toBeInTheDocument()
+    })
+
+    fireEvent.change(screen.getByLabelText('Limite de imagens'), { target: { value: '100' } })
+
+    mockSearchArtworks.mockClear()
+    fireEvent.click(screen.getByText('Atualizar'))
+
+    await waitFor(() => {
       expect(mockSearchArtworks).toHaveBeenCalledWith(
-        expect.objectContaining({ artist: 'Monet', limit: 100 })
+        expect.objectContaining({ refresh: true, limit: 100 })
       )
     })
   })
