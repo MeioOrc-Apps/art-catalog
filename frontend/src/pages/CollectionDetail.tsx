@@ -1,11 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, LayoutGrid, Maximize, Bookmark, Plus, Compass, FolderOpen, ShieldAlert, LogOut } from 'lucide-react'
+import { ArrowLeft, LayoutGrid, Maximize, Bookmark, Plus, Compass, FolderOpen, ShieldAlert, LogOut, ZoomIn, ZoomOut, Maximize2, Download, Loader2 } from 'lucide-react'
 import { listCollections, addToCollection, removeFromCollection, createCollection } from '@/api/artworks'
 import Gallery from '@/components/Gallery'
 import Lightbox from '@/components/Lightbox'
-import Moodboard from '@/components/Moodboard'
-import { useState, useCallback } from 'react'
+import Moodboard, { type MoodboardHandle, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from '@/components/Moodboard'
+import { useState, useCallback, useRef } from 'react'
 import type { Artwork } from '@/types/artwork'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { useAuthStore } from '@/stores/authStore'
@@ -19,6 +19,7 @@ export default function CollectionDetailPage() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [viewMode, setViewMode] = useState<'gallery' | 'moodboard'>('gallery')
   const [collectionTarget, setCollectionTarget] = useState<Artwork | null>(null)
+  const moodboardRef = useRef<MoodboardHandle>(null)
   const [newColName, setNewColName] = useState('')
   const [errorAlert, setErrorAlert] = useState<string | null>(null)
 
@@ -162,47 +163,72 @@ export default function CollectionDetailPage() {
 
         {!isLoading && collection && artworks.length > 0 && (
           <>
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h2 className="font-display font-semibold text-lg text-foreground">
+            {/* Single compact toolbar — all controls in one row */}
+            <div className="mb-2 flex items-center gap-2 flex-wrap">
+              {/* Name + count */}
+              <div className="flex items-baseline gap-2 mr-auto min-w-0">
+                <h2 className="font-display font-semibold text-base text-foreground truncate">
                   {collection.name}
                 </h2>
-                <p className="text-xs text-muted-foreground font-mono mt-0.5">
+                <span className="text-xs text-muted-foreground font-mono shrink-0">
                   {artworks.length} obra{artworks.length !== 1 ? 's' : ''}
-                </p>
+                </span>
               </div>
-              <div className="flex items-center gap-1 bg-accent/5 p-1 rounded-sm border border-border/40">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('gallery')}
-                  className={`p-1.5 rounded-sm transition-colors ${
-                    viewMode === 'gallery'
-                      ? 'bg-background shadow-sm text-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                  title="Visão em Grade"
-                >
-                  <LayoutGrid size={16} />
+
+              {/* Zoom controls — only in moodboard mode */}
+              {viewMode === 'moodboard' && (
+                <div className="flex items-center gap-0.5 bg-card border border-border/40 rounded-sm p-0.5">
+                  <button type="button" onClick={() => moodboardRef.current?.zoomOut()}
+                    disabled={(moodboardRef.current?.zoom ?? 1) <= MIN_ZOOM}
+                    className="p-1.5 rounded-sm text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+                    title="Afastar (−)"><ZoomOut size={14} /></button>
+                  <button type="button" onClick={() => moodboardRef.current?.setZoom(1)}
+                    className="px-2 py-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors min-w-[3rem] text-center"
+                    title="Resetar zoom">
+                    {Math.round((moodboardRef.current?.zoom ?? 1) * 100)}%
+                  </button>
+                  <button type="button" onClick={() => moodboardRef.current?.zoomIn()}
+                    disabled={(moodboardRef.current?.zoom ?? 1) >= MAX_ZOOM}
+                    className="p-1.5 rounded-sm text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+                    title="Aproximar (+)"><ZoomIn size={14} /></button>
+                </div>
+              )}
+
+              {viewMode === 'moodboard' && (
+                <button type="button" onClick={() => moodboardRef.current?.fitView()}
+                  className="flex items-center gap-1 px-2 py-1.5 rounded-sm text-xs text-muted-foreground bg-card border border-border/40 hover:text-foreground transition-colors"
+                  title="Encaixar tudo na tela">
+                  <Maximize2 size={13} />
+                  <span className="hidden sm:inline">Encaixar</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('moodboard')}
-                  className={`p-1.5 rounded-sm transition-colors ${
-                    viewMode === 'moodboard'
-                      ? 'bg-background shadow-sm text-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                  title="Modo Painel Livre"
-                >
-                  <Maximize size={16} />
+              )}
+
+              {viewMode === 'moodboard' && (
+                <button type="button"
+                  onClick={() => moodboardRef.current?.exportPng()}
+                  disabled={moodboardRef.current?.isExporting}
+                  className="flex items-center gap-1 px-2 py-1.5 rounded-sm text-xs text-muted-foreground bg-card border border-border/40 hover:text-foreground disabled:opacity-50 transition-colors"
+                  title="Exportar painel como PNG">
+                  {moodboardRef.current?.isExporting ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
+                  <span className="hidden sm:inline">{moodboardRef.current?.isExporting ? 'Exportando…' : 'Exportar PNG'}</span>
                 </button>
+              )}
+
+              {/* View toggle */}
+              <div className="flex items-center gap-0.5 bg-accent/5 p-0.5 rounded-sm border border-border/40">
+                <button type="button" onClick={() => setViewMode('gallery')}
+                  className={`p-1.5 rounded-sm transition-colors ${viewMode === 'gallery' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  title="Visão em Grade"><LayoutGrid size={15} /></button>
+                <button type="button" onClick={() => setViewMode('moodboard')}
+                  className={`p-1.5 rounded-sm transition-colors ${viewMode === 'moodboard' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  title="Painel Livre"><Maximize size={15} /></button>
               </div>
             </div>
-            
+
             {viewMode === 'gallery' ? (
               <Gallery artworks={artworks} onArtworkClick={handleClick} />
             ) : (
-              <Moodboard collection={collection} onArtworkClick={(index) => setLightboxIndex(index)} />
+              <Moodboard ref={moodboardRef} collection={collection} onArtworkClick={(index) => setLightboxIndex(index)} />
             )}
           </>
         )}
