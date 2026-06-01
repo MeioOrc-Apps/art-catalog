@@ -4,7 +4,7 @@ import { ArrowLeft, LayoutGrid, Maximize, Bookmark, Plus, Compass, FolderOpen, S
 import { listCollections, addToCollection, removeFromCollection, createCollection } from '@/api/artworks'
 import Gallery from '@/components/Gallery'
 import Lightbox from '@/components/Lightbox'
-import Moodboard, { type MoodboardHandle, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from '@/components/Moodboard'
+import Moodboard, { type MoodboardHandle, MIN_ZOOM, MAX_ZOOM } from '@/components/Moodboard'
 import { useState, useCallback, useRef } from 'react'
 import type { Artwork } from '@/types/artwork'
 import ConfirmDialog from '@/components/ConfirmDialog'
