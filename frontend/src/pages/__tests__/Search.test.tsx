@@ -124,6 +124,59 @@ describe('SearchPage', () => {
     })
   })
 
+  it('renders limit slider with default value of 30', () => {
+    renderWithQuery(<SearchPage />)
+    const slider = screen.getAllByLabelText('Limite de imagens')[0]
+    expect(slider).toBeInTheDocument()
+    expect((slider as HTMLInputElement).value).toBe('30')
+    expect(screen.getAllByText('30 imgs')[0]).toBeInTheDocument()
+  })
+
+  it('updates displayed count when slider changes', async () => {
+    renderWithQuery(<SearchPage />)
+    const slider = screen.getAllByLabelText('Limite de imagens')[0]
+    fireEvent.change(slider, { target: { value: '100' } })
+    await waitFor(() => {
+      expect(screen.getAllByText('100 imgs')[0]).toBeInTheDocument()
+    })
+  })
+
+  it('submits search with custom limit from slider', async () => {
+    mockSearchArtworks.mockResolvedValue({
+      matched: true,
+      suggestion: null,
+      suggestions: [],
+      artist: {
+        id: '1',
+        slug: 'monet',
+        canonical_name: 'Monet',
+        last_searched_at: null,
+        sync_status: 'ready',
+        created_at: '2024-01-01',
+        artworks: [],
+        total: 0,
+        limit: 100,
+        offset: 0,
+      },
+    })
+
+    const user = userEvent.setup()
+    renderWithQuery(<SearchPage />)
+
+    const slider = screen.getAllByLabelText('Limite de imagens')[0]
+    fireEvent.change(slider, { target: { value: '100' } })
+
+    const input = screen.getAllByPlaceholderText('Buscar artista…')[0]
+    await user.type(input, 'Monet')
+    await user.click(screen.getAllByLabelText('Buscar')[0])
+
+    await waitFor(() => {
+      expect(mockSearchArtworks).toHaveBeenCalledWith(
+        expect.objectContaining({ artist: 'Monet', limit: 100 })
+      )
+    })
+  })
+
   it('shows delete confirmation when clicking delete button', async () => {
     mockListArtists.mockResolvedValue([
       { 

@@ -19,7 +19,7 @@ class ArtistCreatePayload(BaseModel):
 
 class SearchPayload(BaseModel):
     artist: str = Field(min_length=1, max_length=512)
-    limit: int = Field(default=30, ge=1, le=100)
+    limit: int = Field(default=30, ge=1, le=200)
     refresh: bool = False
 
 

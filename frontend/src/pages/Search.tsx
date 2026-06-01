@@ -106,6 +106,7 @@ function PromptDialog({
 
 export default function SearchPage() {
   const [query, setQuery] = useState('')
+  const [searchLimit, setSearchLimit] = useState(30)
   const [activeSlug, setActiveSlug] = useState<string | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [submittedArtist, setSubmittedArtist] = useState<string | null>(null)
@@ -138,8 +139,8 @@ export default function SearchPage() {
   })
 
   const searchMutation = useMutation({
-    mutationFn: (vars: { artist: string; refresh?: boolean }) =>
-      searchArtworks({ artist: vars.artist, refresh: vars.refresh }),
+    mutationFn: (vars: { artist: string; refresh?: boolean; limit?: number }) =>
+      searchArtworks({ artist: vars.artist, refresh: vars.refresh, limit: vars.limit }),
     onSuccess: (res) => {
       if (!res.matched) {
         setDedupSuggestion({
@@ -321,8 +322,8 @@ export default function SearchPage() {
     const trimmed = query.trim()
     if (!trimmed || searchMutation.isPending) return
     setPendingSearch(trimmed)
-    searchMutation.mutate({ artist: trimmed })
-  }, [query, searchMutation])
+    searchMutation.mutate({ artist: trimmed, limit: searchLimit })
+  }, [query, searchMutation, searchLimit])
 
   const handleArtistClick = useCallback((slug: string, name?: string) => {
     setActiveSlug(slug)
@@ -345,22 +346,22 @@ export default function SearchPage() {
   const handleRefresh = useCallback(() => {
     if (!submittedArtist || isProcessing) return
     queryClient.removeQueries({ queryKey: ['artist-pages', activeSlug] })
-    searchMutation.mutate({ artist: submittedArtist, refresh: true })
-  }, [submittedArtist, activeSlug, searchMutation, queryClient, isProcessing])
+    searchMutation.mutate({ artist: submittedArtist, refresh: true, limit: searchLimit })
+  }, [submittedArtist, activeSlug, searchMutation, queryClient, isProcessing, searchLimit])
 
   const handleDedupAccept = useCallback(() => {
     if (!dedupSuggestion?.artist) return
     setDedupSuggestion(null)
     setQuery(dedupSuggestion.artist)
-    searchMutation.mutate({ artist: dedupSuggestion.artist })
-  }, [dedupSuggestion, searchMutation])
+    searchMutation.mutate({ artist: dedupSuggestion.artist, limit: searchLimit })
+  }, [dedupSuggestion, searchMutation, searchLimit])
 
   const handleDedupForceCreate = useCallback(() => {
     if (!pendingSearch) return
     setDedupSuggestion(null)
-    searchMutation.mutate({ artist: pendingSearch, refresh: true })
+    searchMutation.mutate({ artist: pendingSearch, refresh: true, limit: searchLimit })
     setPendingSearch(null)
-  }, [pendingSearch, searchMutation])
+  }, [pendingSearch, searchMutation, searchLimit])
 
   // const chartChips = artistsList.map((a) => ({
   //   slug: a.slug, canonical_name: a.canonical_name, artwork_count: a.artworks?.length || 0, sync_status: a.sync_status
@@ -389,6 +390,19 @@ export default function SearchPage() {
                   className="w-full h-10 pl-8 pr-3 text-base rounded-sm border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
                   disabled={isProcessing || false}
                 />
+              </div>
+              <div className="flex flex-col items-center shrink-0" title="Quantidade de imagens">
+                <input
+                  type="range"
+                  min={10}
+                  max={200}
+                  step={10}
+                  value={searchLimit}
+                  onChange={(e) => setSearchLimit(Number(e.target.value))}
+                  className="w-14 accent-[var(--color-accent)] cursor-pointer"
+                  aria-label="Limite de imagens"
+                />
+                <span className="text-[10px] text-muted-foreground leading-none mt-0.5 tabular-nums">{searchLimit}</span>
               </div>
               <button
                 type="submit"
@@ -424,6 +438,19 @@ export default function SearchPage() {
                   className="w-full h-10 pl-8 pr-3 text-base rounded-sm border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
                   disabled={isProcessing || false}
                 />
+              </div>
+              <div className="flex flex-col items-center shrink-0" title="Quantidade de imagens a buscar">
+                <input
+                  type="range"
+                  min={10}
+                  max={200}
+                  step={10}
+                  value={searchLimit}
+                  onChange={(e) => setSearchLimit(Number(e.target.value))}
+                  className="w-16 accent-[var(--color-accent)] cursor-pointer"
+                  aria-label="Limite de imagens"
+                />
+                <span className="text-[10px] text-muted-foreground leading-none mt-0.5 tabular-nums">{searchLimit} imgs</span>
               </div>
               <button
                 type="submit"
