@@ -42,6 +42,9 @@ build-backend = "hatchling.build"
 [tool.ruff]
 line-length = 300
 
+[tool.coverage.run]
+concurrency = ["greenlet"]
+
 [tool.coverage.report]
 omit = ["src/auth/quotas.py"]
 

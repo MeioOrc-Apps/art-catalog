@@ -49,3 +49,6 @@ pgdata/
 # Coverage annotation output
 cov_annotate/
 cov_annotate2/
+backend/src/collections/*.cover
+frontend/playwright-report/
+frontend/test-results/

@@ -2,7 +2,10 @@ import pytest
 
 
 class TestFactory:
-    def test_mock_when_provider_is_mock(self):
+    def test_mock_when_provider_is_mock(self, monkeypatch):
+        from src.core import config
+        monkeypatch.setattr(config.settings, "image_search_provider", "mock")
+
         from src.search import get_provider
         from src.search.providers.mock import MockProvider
 

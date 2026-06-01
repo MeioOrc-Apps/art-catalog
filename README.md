@@ -1,13 +1,23 @@
 # Art Catalog
 
 <div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/photoprism.png" alt="Art Catalog Icon" width="120" />
+  <img src="docs/screenshots/03-gallery.png" alt="Art Catalog — galeria masonry" width="720" />
   <p><em>Catálogo pessoal de referências artísticas e moodboard.</em></p>
 </div>
 
 Você digita o nome de um artista; a aplicação busca obras na web, processa as imagens (3 versões + paleta de cores + phash) e exibe numa galeria masonry. Conta também com upload manual de imagens, organização por coleções, filtro global por paleta de cores e um moodboard interativo.
 
 > **Self-hosted**, registro fechado por convite. Roda em Docker Compose no ZimaOS atrás de Cloudflare Tunnel.
+
+## 📸 Screenshots
+
+| Acervo de Artistas | Galeria Masonry |
+|:---:|:---:|
+| ![Acervo](docs/screenshots/02-home-acervo.png) | ![Galeria](docs/screenshots/03-gallery.png) |
+
+| Explorar por Cores | Coleções |
+|:---:|:---:|
+| ![Explorar](docs/screenshots/04-explore.png) | ![Coleções](docs/screenshots/05-collections.png) |
 
 ## 🌟 Funcionalidades (MVP)
 
@@ -102,6 +112,21 @@ npm run test:ui
 # Roda os testes exibindo o relatório de cobertura de código
 npm run coverage
 ```
+
+**E2E (Playwright) — rodam localmente, requerem a app em `localhost:5173`:**
+```bash
+cd frontend
+# Instalar browsers (primeira vez)
+npx playwright install chromium
+
+# Roda todos os testes E2E (auth, busca, galeria, coleções)
+npm run e2e
+
+# Abre o relatório HTML após rodar
+npm run e2e:report
+```
+
+> Os testes E2E não fazem parte do CI — rodam apenas localmente com o Docker Compose ativo.
 
 ---
 

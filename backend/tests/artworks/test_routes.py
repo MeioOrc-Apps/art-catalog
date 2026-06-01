@@ -87,6 +87,7 @@ class TestSearchRoute:
         import src.core.config as cfg
         tmp = Path(tempfile.mkdtemp())
         monkeypatch.setattr(cfg.settings, "images_dir", str(tmp))
+        monkeypatch.setattr(cfg.settings, "image_search_provider", "mock")
 
         try:
             cookies = await _login(async_client, db_session)

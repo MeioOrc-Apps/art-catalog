@@ -188,8 +188,8 @@ Para cada `ImageResult`, em ordem:
 7. Salvar em `IMAGES_DIR/{artist_slug}/{sha256(url)[:2]}/{sha256(url)}*.jpg`.
 
 Requisitos de robustez:
-- [ ] Falha ao baixar/processar **uma** imagem nunca derruba o lote (try/except por item, log e segue).
-- [ ] `mock://` é tratado pela pipeline gerando imagem local (não faz rede).
+- [x] Falha ao baixar/processar **uma** imagem nunca derruba o lote (try/except por item, log e segue).
+- [x] `mock://` é tratado pela pipeline gerando imagem local (não faz rede).
 
 ## 9. API (somente rotas novas; auth vem do Save State)
 
@@ -271,7 +271,7 @@ DEFAULT_RESULTS_PER_SEARCH=30
 ## 13. Roadmap por fases
 
 ### Fase 0 — Bootstrap
-- [ ] Estrutura de pastas backend/frontend, Dockerfiles, `docker-compose.yml` (dev), `.env.example`, README.
+- [x] Estrutura de pastas backend/frontend, Dockerfiles, `docker-compose.yml` (dev), `.env.example`, README.
 - **DoD:** `docker compose up` sobe `db` + `api` (hello world) + `frontend` (hello world).
 
 ### Fase 1 — Fundação (copiar do Save State)
