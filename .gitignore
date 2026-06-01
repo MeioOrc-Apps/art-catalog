@@ -45,3 +45,7 @@ backend/.coverage
 
 # Docker volumes
 pgdata/
+
+# Coverage annotation output
+cov_annotate/
+cov_annotate2/
