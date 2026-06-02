@@ -2,7 +2,7 @@ import { render, screen, waitFor, fireEvent, within } from '@testing-library/rea
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
-import type { Collection } from '@/types/artwork'
+import type { Collection, DominantColor } from '@/types/artwork'
 
 const mockLogout = vi.fn()
 const mockListCollections = vi.fn()
@@ -43,7 +43,7 @@ const artwork1 = {
   image_thumb: 'a1_thumb.jpg',
   width: 1200,
   height: 900,
-  dominant_colors: [[255, 0, 0]],
+  dominant_colors: [[255, 0, 0]] as DominantColor[],
   phash: 'h1',
   is_downloaded: true,
   is_pinned: false,
@@ -55,7 +55,7 @@ const mockCollection: Collection = {
   name: 'Favorites',
   user_id: 'u1',
   created_at: '2024-01-01T00:00:00Z',
-  items: [{ id: 'i1', collection_id: 'col-abc', artwork_id: 'a1', artwork: artwork1, note: null, x: 0, y: 0, width: 200, height: 150, z_index: 1, created_at: '2024-01-01T00:00:00Z' }],
+  items: [{ id: 'i1', artwork_id: 'a1', artwork: artwork1, note: null, x: 0, y: 0, width: 200, height: 150, z_index: 1, created_at: '2024-01-01T00:00:00Z' }],
 }
 
 function renderWithRoute(collectionId: string, collections: Collection[]) {
