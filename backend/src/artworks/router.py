@@ -2,7 +2,8 @@ import io
 from uuid import UUID
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Query, UploadFile
-from PIL import Image as PILImage, UnidentifiedImageError
+from PIL import Image as PILImage
+from PIL import UnidentifiedImageError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.artworks.repository import ArtworkRepository
