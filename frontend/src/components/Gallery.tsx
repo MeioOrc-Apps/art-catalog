@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 interface GalleryProps {
   artworks: Artwork[]
   onArtworkClick: (artwork: Artwork, index: number) => void
+  quality?: 'thumb' | 'large'
 }
 
 function useColumns() {
@@ -25,7 +26,7 @@ function useColumns() {
   return columns
 }
 
-export default function Gallery({ artworks, onArtworkClick }: GalleryProps) {
+export default function Gallery({ artworks, onArtworkClick, quality = 'thumb' }: GalleryProps) {
   const columnsCount = useColumns()
 
   if (!artworks || artworks.length === 0) {
@@ -48,6 +49,7 @@ export default function Gallery({ artworks, onArtworkClick }: GalleryProps) {
               artwork={artwork}
               index={originalIndex}
               onClick={(i) => onArtworkClick(artwork, i)}
+              quality={quality}
             />
           ))}
         </div>

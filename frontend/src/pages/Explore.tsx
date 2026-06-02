@@ -9,6 +9,7 @@ import ConfirmDialog from '@/components/ConfirmDialog'
 import type { Artwork } from '@/types/artwork'
 import { useLogout } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/authStore'
+import { useGalleryQuality } from '@/hooks/useGalleryQuality'
 
 const COLORS = [
   { name: 'Vermelho', hex: 'ef4444' },
@@ -33,6 +34,7 @@ export default function ExplorePage() {
   const queryClient = useQueryClient()
   const logout = useLogout()
   const { user } = useAuthStore()
+  const { quality, toggleQuality } = useGalleryQuality()
   const loadMoreRef = useRef<HTMLDivElement>(null)
 
   const pagesQuery = useInfiniteQuery({
@@ -167,6 +169,17 @@ export default function ExplorePage() {
           <div className="max-w-6xl mx-auto flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
             <span className="text-sm font-medium text-muted-foreground shrink-0 mr-2">Cores:</span>
             <button
+              onClick={toggleQuality}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-colors border ${
+                quality === 'large'
+                  ? 'bg-accent/10 border-accent/40 text-accent'
+                  : 'bg-card border-border/50 text-muted-foreground hover:text-foreground hover:border-border'
+              }`}
+              title={quality === 'large' ? 'Qualidade alta (clique para SD)' : 'Qualidade baixa (clique para HD)'}
+            >
+              {quality === 'large' ? 'HD' : 'SD'}
+            </button>
+            <button
               onClick={() => setActiveColor(null)}
               className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
                 activeColor === null 
@@ -203,7 +216,7 @@ export default function ExplorePage() {
             </div>
           ) : allArtworks.length > 0 ? (
             <>
-              <Gallery artworks={allArtworks} onArtworkClick={handleLightboxOpen} />
+              <Gallery artworks={allArtworks} onArtworkClick={handleLightboxOpen} quality={quality} />
               {pagesQuery.hasNextPage && (
                 <div ref={loadMoreRef} className="h-12 flex items-center justify-center mt-4">
                   {pagesQuery.isFetchingNextPage && (

@@ -26,6 +26,7 @@ import type { Artwork, ArtistSummary, ArtistPaginated } from '@/types/artwork'
 import { SearchIcon, RefreshCw, Upload, AlertCircle, LogOut, Plus, Bookmark, FolderOpen, ShieldAlert, ArrowLeft, Compass, X, Clock } from 'lucide-react'
 import { useLogout } from '@/hooks/useAuth'
 import { useRecentSearches } from '@/hooks/useRecentSearches'
+import { useGalleryQuality } from '@/hooks/useGalleryQuality'
 import { useAuthStore } from '@/stores/authStore'
 import { Link } from 'react-router-dom'
 import ConfirmDialog from '@/components/ConfirmDialog'
@@ -133,6 +134,7 @@ export default function SearchPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const prevSyncStatusRef = useRef<string | undefined>(undefined)
   const { recents, addSearch, removeSearch } = useRecentSearches()
+  const { quality, toggleQuality } = useGalleryQuality()
 
   const { data: artistsList = [] } = useQuery({
     queryKey: ['artists'],
@@ -637,11 +639,19 @@ export default function SearchPage() {
                     <RefreshCw size={14} />
                     Atualizar
                   </button>
+                  <button
+                    type="button"
+                    onClick={toggleQuality}
+                    className={`flex items-center px-2.5 py-1 rounded-sm text-base font-mono font-medium transition-colors ${quality === 'large' ? 'text-accent bg-accent/10' : 'text-muted-foreground hover:text-foreground hover:bg-card'}`}
+                    title={quality === 'large' ? 'Qualidade alta (clique para SD)' : 'Qualidade baixa (clique para HD)'}
+                  >
+                    {quality === 'large' ? 'HD' : 'SD'}
+                  </button>
                 </div>
               </div>
             </div>
             <div className="flex-1 p-3 md:p-4">
-              <Gallery artworks={displayWorks} onArtworkClick={handleLightboxOpen} />
+              <Gallery artworks={displayWorks} onArtworkClick={handleLightboxOpen} quality={quality} />
               {pagesQuery.hasNextPage && (
                 <div ref={loadMoreRef} className="h-12 flex items-center justify-center">
                   {pagesQuery.isFetchingNextPage && (

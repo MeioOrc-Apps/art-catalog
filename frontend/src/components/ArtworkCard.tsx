@@ -5,6 +5,7 @@ interface ArtworkCardProps {
   artwork: Artwork
   index: number
   onClick: (index: number) => void
+  quality?: 'thumb' | 'large'
 }
 
 function PaletteBar({ colors }: { colors: [number, number, number][] }) {
@@ -21,7 +22,7 @@ function PaletteBar({ colors }: { colors: [number, number, number][] }) {
   )
 }
 
-export default function ArtworkCard({ artwork, index, onClick }: ArtworkCardProps) {
+export default function ArtworkCard({ artwork, index, onClick, quality = 'thumb' }: ArtworkCardProps) {
   return (
     <article
       className="art-masonry-item break-inside-avoid mb-4 cursor-pointer group rounded-sm overflow-hidden bg-card/50 border border-border/30 animate-slide-up"
@@ -30,7 +31,7 @@ export default function ArtworkCard({ artwork, index, onClick }: ArtworkCardProp
     >
       <div className="relative overflow-hidden bg-background">
         <img
-          src={`/images/${artwork.image_thumb}`}
+          src={`/images/${quality === 'large' ? (artwork.image_large || artwork.image_thumb) : artwork.image_thumb}`}
           alt={artwork.title || artwork.source_image_url}
           loading="lazy"
           className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
