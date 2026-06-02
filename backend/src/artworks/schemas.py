@@ -113,6 +113,7 @@ class CollectionItemOut(BaseModel):
     width: float | None = None
     height: float | None = None
     z_index: int
+    rotation: float = 0.0
     created_at: datetime
     artwork: ArtworkOut | None = None
 
@@ -125,6 +126,7 @@ class CollectionItemUpdatePayload(BaseModel):
     width: float | None = None
     height: float | None = None
     z_index: int | None = None
+    rotation: float | None = None
 
 
 class CollectionOut(BaseModel):
