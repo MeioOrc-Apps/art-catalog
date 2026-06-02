@@ -67,10 +67,9 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
     const [zoom, setZoomState] = useState(1)
     const [isExporting, setIsExporting] = useState(false)
     const [selectedId, setSelectedId] = useState<string | null>(null)
-    const [rotations, setRotations] = useState<Record<string, number>>(() => {
-      try { return JSON.parse(localStorage.getItem(`mb_rot_${collection.id}`) ?? '{}') }
-      catch { return {} }
-    })
+    const [rotations, setRotations] = useState<Record<string, number>>(() =>
+      Object.fromEntries(collection.items.map(i => [i.id, i.rotation ?? 0]))
+    )
     const lastTapRef = useRef<Record<string, number>>({})
     const pinchStartDistRef = useRef<number | null>(null)
     const pinchStartZoomRef = useRef<number>(1)
@@ -99,12 +98,10 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
     }, [updateMutation])
 
     const setItemRotation = useCallback((id: string, deg: number) => {
-      setRotations(prev => {
-        const next = { ...prev, [id]: deg }
-        try { localStorage.setItem(`mb_rot_${collection.id}`, JSON.stringify(next)) } catch {}
-        return next
-      })
-    }, [collection.id])
+      setRotations(prev => ({ ...prev, [id]: deg }))
+      const item = collection.items.find(i => i.id === id)
+      if (item) updateMutation.mutate({ artworkId: item.artwork_id, payload: { rotation: deg } })
+    }, [collection.items, updateMutation])
 
     const startRotateDrag = useCallback((e: React.MouseEvent | React.TouchEvent, id: string) => {
       e.stopPropagation()
@@ -129,7 +126,10 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
         setRotations(prev => ({ ...prev, [rotatingRef.current!.id]: newRot }))
       }
       const onEnd = () => {
-        if (rotatingRef.current) setItemRotation(rotatingRef.current.id, rotatingRef.current.last)
+        if (rotatingRef.current) {
+          const { id, last } = rotatingRef.current
+          setItemRotation(id, last)
+        }
         rotatingRef.current = null
         document.removeEventListener('mousemove', onMove)
         document.removeEventListener('touchmove', onMove)

@@ -111,6 +111,7 @@ class CollectionItem(Base):
     width: Mapped[float | None] = mapped_column(Float, nullable=True)
     height: Mapped[float | None] = mapped_column(Float, nullable=True)
     z_index: Mapped[int] = mapped_column(Integer, server_default="1", nullable=False)
+    rotation: Mapped[float] = mapped_column(Float, server_default="0.0", nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

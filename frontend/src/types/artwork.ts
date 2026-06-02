@@ -74,6 +74,7 @@ export interface CollectionItem {
   width: number | null
   height: number | null
   z_index: number
+  rotation: number
   created_at: string
   artwork: Artwork | null
 }

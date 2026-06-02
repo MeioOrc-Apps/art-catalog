@@ -55,7 +55,7 @@ const mockCollection: Collection = {
   name: 'Favorites',
   user_id: 'u1',
   created_at: '2024-01-01T00:00:00Z',
-  items: [{ id: 'i1', artwork_id: 'a1', artwork: artwork1, note: null, x: 0, y: 0, width: 200, height: 150, z_index: 1, created_at: '2024-01-01T00:00:00Z' }],
+  items: [{ id: 'i1', artwork_id: 'a1', artwork: artwork1, note: null, x: 0, y: 0, width: 200, height: 150, z_index: 1, rotation: 0, created_at: '2024-01-01T00:00:00Z' }],
 }
 
 function renderWithRoute(collectionId: string, collections: Collection[]) {

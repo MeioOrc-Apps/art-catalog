@@ -57,6 +57,7 @@ const mockCollection: Collection = {
       width: 200,
       height: 150,
       z_index: 1,
+      rotation: 0,
       created_at: '2024-01-01T00:00:00Z',
     },
   ],
