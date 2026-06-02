@@ -34,6 +34,11 @@ async def create_collection(
     user: User = Depends(current_active_user),
     session: AsyncSession = Depends(get_async_session),
 ):
+    from src.auth.quotas import check_collections_quota
+    try:
+        await check_collections_quota(session, user.id)
+    except ValueError as exc:
+        raise HTTPException(429, str(exc))
     repo = CollectionRepository(session)
     col = await repo.create_collection(user.id, payload.name)
     await session.commit()

@@ -23,11 +23,13 @@ import Gallery from '@/components/Gallery'
 import Lightbox from '@/components/Lightbox'
 import Skeleton from '@/components/Skeleton'
 import type { Artwork, ArtistSummary, ArtistPaginated } from '@/types/artwork'
-import { SearchIcon, RefreshCw, Upload, AlertCircle, LogOut, Plus, Bookmark, FolderOpen, ShieldAlert, ArrowLeft, Compass } from 'lucide-react'
+import { SearchIcon, RefreshCw, Upload, AlertCircle, LogOut, Plus, Bookmark, FolderOpen, ShieldAlert, ArrowLeft, Compass, X, Clock } from 'lucide-react'
 import { useLogout } from '@/hooks/useAuth'
+import { useRecentSearches } from '@/hooks/useRecentSearches'
 import { useAuthStore } from '@/stores/authStore'
 import { Link } from 'react-router-dom'
 import ConfirmDialog from '@/components/ConfirmDialog'
+import Toast from '@/components/Toast'
 
 /* ── Prompt dialog ── */
 function PromptDialog({
@@ -128,6 +130,9 @@ export default function SearchPage() {
   const logout = useLogout()
   const { user } = useAuthStore()
   const loadMoreRef = useRef<HTMLDivElement>(null)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const prevSyncStatusRef = useRef<string | undefined>(undefined)
+  const { recents, addSearch, removeSearch } = useRecentSearches()
 
   const { data: artistsList = [] } = useQuery({
     queryKey: ['artists'],
@@ -150,6 +155,7 @@ export default function SearchPage() {
         return
       }
       setDedupSuggestion(null)
+      addSearch(res.artist!.canonical_name)
       queryClient.invalidateQueries({ queryKey: ['artists'] })
       queryClient.removeQueries({ queryKey: ['artist-pages', res.artist!.slug] })
       setActiveSlug(res.artist!.slug)
@@ -301,6 +307,20 @@ export default function SearchPage() {
     obs.observe(el)
     return () => obs.disconnect()
   }, [pagesQuery])
+
+  useEffect(() => {
+    prevSyncStatusRef.current = undefined
+  }, [activeSlug])
+
+  useEffect(() => {
+    const status = pagesQuery.data?.pages?.[0]?.sync_status
+    if (prevSyncStatusRef.current === 'processing' && status === 'ready') {
+      const name = pagesQuery.data?.pages?.[0]?.canonical_name ?? submittedArtist ?? ''
+      const total = pagesQuery.data?.pages?.[0]?.total ?? 0
+      setToastMessage(`"${name}" — ${total} obras encontradas`)
+    }
+    prevSyncStatusRef.current = status
+  }, [pagesQuery.data, submittedArtist])
 
   const allArtworks: Artwork[] = pagesQuery.data?.pages.flatMap((p) => p.artworks) ?? []
   const totalArtworks = pagesQuery.data?.pages[0]?.total ?? 0
@@ -689,6 +709,30 @@ export default function SearchPage() {
           <div className="flex-1 flex flex-col px-4 py-4 max-w-6xl mx-auto w-full relative">
             {artistsList.length > 0 ? (
               <>
+                {recents.length > 0 && (
+                  <div className="flex items-center gap-2 mb-4 flex-wrap">
+                    <Clock size={13} className="text-muted-foreground shrink-0" aria-label="Pesquisas recentes" />
+                    {recents.map((r) => (
+                      <span key={r} className="flex items-center gap-1 pl-3 pr-1 py-0.5 rounded-full bg-card border border-border/50 text-xs text-foreground">
+                        <button
+                          type="button"
+                          className="hover:text-accent transition-colors"
+                          onClick={() => { setQuery(r); searchMutation.mutate({ artist: r, limit: searchLimit }) }}
+                        >
+                          {r}
+                        </button>
+                        <button
+                          type="button"
+                          className="p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                          onClick={() => removeSearch(r)}
+                          aria-label={`Remover ${r}`}
+                        >
+                          <X size={11} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <div className="absolute top-4 right-4 z-10">
                   <div className="flex items-center text-[11px] text-muted-foreground bg-card/40 backdrop-blur-sm p-0.5 rounded-sm border border-border/30 shadow-sm">
                     <button 
@@ -768,6 +812,32 @@ export default function SearchPage() {
                 <p className="text-base text-muted-foreground text-center max-w-md">
                   Busque pelo nome de um artista para baixar suas obras e criar sua galeria pessoal.
                 </p>
+                {recents.length > 0 && (
+                  <div className="mt-6 flex flex-col items-center gap-2">
+                    <Clock size={14} className="text-muted-foreground" aria-label="Pesquisas recentes" />
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {recents.map((r) => (
+                        <span key={r} className="flex items-center gap-1 pl-3 pr-1 py-1 rounded-full bg-card border border-border/50 text-sm text-foreground">
+                          <button
+                            type="button"
+                            className="hover:text-accent transition-colors"
+                            onClick={() => { setQuery(r); searchMutation.mutate({ artist: r, limit: searchLimit }) }}
+                          >
+                            {r}
+                          </button>
+                          <button
+                            type="button"
+                            className="p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                            onClick={() => removeSearch(r)}
+                            aria-label={`Remover ${r}`}
+                          >
+                            <X size={12} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -878,6 +948,8 @@ export default function SearchPage() {
         confirmLabel="OK"
         onConfirm={() => setErrorAlert(null)}
       />
+
+      <Toast message={toastMessage} onDone={() => setToastMessage(null)} />
     </div>
   )
 }

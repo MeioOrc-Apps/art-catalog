@@ -1,6 +1,8 @@
+import io
 from uuid import UUID
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Query, UploadFile
+from PIL import Image as PILImage, UnidentifiedImageError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.artworks.repository import ArtworkRepository
@@ -24,6 +26,8 @@ from src.storage.images import process_raw_image
 
 router = APIRouter(prefix="/api/artworks", tags=["artworks"])
 
+_ALLOWED_UPLOAD_FORMATS = {"JPEG", "PNG", "GIF", "WEBP", "BMP", "TIFF"}
+
 
 @router.post("/search", response_model=SearchResponse)
 async def search_artworks(
@@ -32,6 +36,11 @@ async def search_artworks(
     user: User = Depends(current_active_user),
     session: AsyncSession = Depends(get_async_session),
 ):
+    from src.auth.quotas import check_artists_quota
+    try:
+        await check_artists_quota(session)
+    except ValueError as exc:
+        raise HTTPException(429, str(exc))
     provider = get_provider()
     service = SearchService(session, provider, background_tasks)
     return await service.search(
@@ -93,6 +102,11 @@ async def create_artist(
     user: User = Depends(current_active_user),
     session: AsyncSession = Depends(get_async_session),
 ):
+    from src.auth.quotas import check_artists_quota
+    try:
+        await check_artists_quota(session)
+    except ValueError as exc:
+        raise HTTPException(429, str(exc))
     repo = ArtworkRepository(session)
     artist = await repo.get_or_create_artist(payload.name)
     await session.commit()
@@ -154,11 +168,14 @@ async def upload_artwork(
     import uuid
 
     for file in files:
-        if not file.content_type.startswith("image/"):
-            continue
-            
         data = await file.read()
         if len(data) > settings.max_download_mb * 1024 * 1024:
+            continue
+        try:
+            with PILImage.open(io.BytesIO(data)) as probe:
+                if probe.format not in _ALLOWED_UPLOAD_FORMATS:
+                    continue
+        except (UnidentifiedImageError, Exception):
             continue
 
         unique_source = f"manual_upload_{uuid.uuid4()}"

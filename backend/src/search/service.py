@@ -1,12 +1,12 @@
 import logging
 
-import httpx
 from fastapi import BackgroundTasks
 from slugify import slugify
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.artworks.repository import ArtworkRepository
 from src.artworks.schemas import ArtistOut, SearchResponse
+from src.common.url_validator import make_safe_async_client
 from src.core import database
 from src.storage.images import process
 
@@ -32,7 +32,7 @@ async def perform_search_task(
             results = await provider.search(artist_name, limit, start_offset=start_offset)
             logger.info("got %d results for %s", len(results), artist_name)
 
-            async with httpx.AsyncClient(
+            async with make_safe_async_client(
                 timeout=20,
                 follow_redirects=True,
                 headers={"User-Agent": "Mozilla/5.0 (compatible; ArtCatalogBot/1.0)"},

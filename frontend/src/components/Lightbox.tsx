@@ -255,7 +255,7 @@ export default function Lightbox({
                 <span className="text-foreground">{artwork.width}&times;{artwork.height}</span>
               </div>
             )}
-            {artwork.source_page_url && (
+            {artwork.source_page_url?.match(/^https?:\/\//) && (
               <>
                 <div className="w-1 h-1 rounded-full bg-border/50 hidden sm:block" />
                 <a

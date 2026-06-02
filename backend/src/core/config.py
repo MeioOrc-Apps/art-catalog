@@ -61,6 +61,11 @@ class Settings(BaseSettings):
 
     RATE_LIMITS_DISABLED: bool = False
 
+    TRUSTED_PROXY_IPS: str = "*"
+
+    MAX_ARTISTS_TOTAL: int = 1000
+    MAX_COLLECTIONS_PER_USER: int = 50
+
     CORS_ORIGINS: list[str] | None = None
 
     @field_validator("CORS_ORIGINS", mode="before")
@@ -73,6 +78,16 @@ class Settings(BaseSettings):
         elif isinstance(v, str) and v.startswith("["):
             import json
             return json.loads(v)
+        return v
+
+    @field_validator("FIRST_ADMIN_PASSWORD")
+    @classmethod
+    def admin_password_strong(cls, v: str) -> str:
+        env = os.getenv("ENVIRONMENT", "production").lower()
+        if env == "production" and v and len(v) < 12:
+            raise ValueError(
+                "FIRST_ADMIN_PASSWORD must be at least 12 characters in production."
+            )
         return v
 
     @field_validator("JWT_SECRET")

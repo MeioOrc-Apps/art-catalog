@@ -4,16 +4,17 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import structlog
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from src.artworks.router import router as artworks_router
+from src.auth.manager import current_active_user
+from src.auth.models import User
 from src.auth.routes import router as auth_router
 from src.collections.router import router as collections_router
 from src.common.rate_limit import limiter
@@ -41,6 +42,15 @@ class CSRFMiddleware(BaseHTTPMiddleware):
             if not secrets.compare_digest(csrf_cookie, csrf_header):
                 return JSONResponse({"detail": "CSRF_TOKEN_INVALID"}, status_code=403)
         return await call_next(request)
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        return response
 
 
 @asynccontextmanager
@@ -107,16 +117,26 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["Content-Type", "Authorization", "X-CSRF-Token"],
 )
+app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(CSRFMiddleware)
-app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=settings.TRUSTED_PROXY_IPS)
 
 app.include_router(auth_router)
 app.include_router(artworks_router)
 app.include_router(collections_router)
 
-images_path = Path(settings.images_dir)
-images_path.mkdir(parents=True, exist_ok=True)
-app.mount("/images", StaticFiles(directory=str(images_path)), name="images")
+_images_base = Path(settings.images_dir).resolve()
+_images_base.mkdir(parents=True, exist_ok=True)
+
+
+@app.get("/images/{path:path}")
+async def serve_image(path: str, user: User = Depends(current_active_user)):
+    full_path = (_images_base / path).resolve()
+    if not str(full_path).startswith(str(_images_base)):
+        raise HTTPException(403)
+    if not full_path.exists():
+        raise HTTPException(404)
+    return FileResponse(full_path)
 
 
 @app.get("/api/health")
