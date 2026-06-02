@@ -62,3 +62,13 @@
     text-wrap: balance;
   }
 }
+
+/* Moodboard resize handles — visible only on hover or when item is selected */
+.moodboard-item .moodboard-handle {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.moodboard-item:hover .moodboard-handle,
+.moodboard-item.is-selected .moodboard-handle {
+  opacity: 1;
+}

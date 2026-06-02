@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import { Rnd } from 'react-rnd'
+import { RotateCcw, RotateCw } from 'lucide-react'
 import type { Collection, CollectionItem } from '@/types/artwork'
 import { updateCollectionItem } from '@/api/artworks'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -16,7 +17,7 @@ export interface MoodboardHandle {
 
 interface MoodboardProps {
   collection: Collection
-  onArtworkClick: (index: number) => void
+  onArtworkClick: (artworkId: string) => void
 }
 
 const MOBILE_BREAKPOINT = 640
@@ -39,15 +40,20 @@ function useIsMobile() {
 const HANDLE_SIZE_DESKTOP = 8
 const HANDLE_SIZE_MOBILE = 20
 
+const HANDLE_DIRS = ['bottomRight','bottomLeft','topRight','topLeft','bottom','right','top','left'] as const
+
 function buildHandleStyles(size: number): Record<string, React.CSSProperties> {
   const style: React.CSSProperties = {
     width: size, height: size,
-    background: 'hsl(var(--color-accent) / 0.7)',
-    borderRadius: 2,
+    background: 'rgba(212, 165, 116, 0.9)',
+    borderRadius: '50%',
+    zIndex: 20,
   }
-  return Object.fromEntries(
-    ['bottomRight','bottomLeft','topRight','topLeft','bottom','right','top','left'].map(h => [h, style])
-  )
+  return Object.fromEntries(HANDLE_DIRS.map(h => [h, style]))
+}
+
+function buildHandleClasses(): Record<string, string> {
+  return Object.fromEntries(HANDLE_DIRS.map(h => [h, 'moodboard-handle']))
 }
 
 const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
@@ -60,9 +66,16 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
     const [items, setItems] = useState<CollectionItem[]>(collection.items)
     const [zoom, setZoomState] = useState(1)
     const [isExporting, setIsExporting] = useState(false)
+    const [selectedId, setSelectedId] = useState<string | null>(null)
+    const [rotations, setRotations] = useState<Record<string, number>>(() => {
+      try { return JSON.parse(localStorage.getItem(`mb_rot_${collection.id}`) ?? '{}') }
+      catch { return {} }
+    })
     const lastTapRef = useRef<Record<string, number>>({})
     const pinchStartDistRef = useRef<number | null>(null)
     const pinchStartZoomRef = useRef<number>(1)
+    const itemEls = useRef<Record<string, HTMLDivElement | null>>({})
+    const rotatingRef = useRef<{ id: string; cx: number; cy: number; startAngle: number; startRot: number; last: number } | null>(null)
 
     useEffect(() => {
       setItems(prev => prev.length !== collection.items.length ? collection.items : prev)
@@ -85,17 +98,62 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
       updateMutation.mutate({ artworkId, payload: { width, height, x: position.x, y: position.y } })
     }, [updateMutation])
 
+    const setItemRotation = useCallback((id: string, deg: number) => {
+      setRotations(prev => {
+        const next = { ...prev, [id]: deg }
+        try { localStorage.setItem(`mb_rot_${collection.id}`, JSON.stringify(next)) } catch {}
+        return next
+      })
+    }, [collection.id])
+
+    const startRotateDrag = useCallback((e: React.MouseEvent | React.TouchEvent, id: string) => {
+      e.stopPropagation()
+      e.preventDefault()
+      const el = itemEls.current[id]
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const cx = rect.left + rect.width / 2
+      const cy = rect.top + rect.height / 2
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
+      const startAngle = Math.atan2(clientY - cy, clientX - cx) * (180 / Math.PI)
+      rotatingRef.current = { id, cx, cy, startAngle, startRot: rotations[id] || 0, last: rotations[id] || 0 }
+
+      const onMove = (ev: MouseEvent | TouchEvent) => {
+        if (!rotatingRef.current) return
+        const x = 'touches' in ev ? ev.touches[0].clientX : ev.clientX
+        const y = 'touches' in ev ? ev.touches[0].clientY : ev.clientY
+        const angle = Math.atan2(y - rotatingRef.current.cy, x - rotatingRef.current.cx) * (180 / Math.PI)
+        const newRot = rotatingRef.current.startRot + (angle - rotatingRef.current.startAngle)
+        rotatingRef.current.last = newRot
+        setRotations(prev => ({ ...prev, [rotatingRef.current!.id]: newRot }))
+      }
+      const onEnd = () => {
+        if (rotatingRef.current) setItemRotation(rotatingRef.current.id, rotatingRef.current.last)
+        rotatingRef.current = null
+        document.removeEventListener('mousemove', onMove)
+        document.removeEventListener('touchmove', onMove)
+        document.removeEventListener('mouseup', onEnd)
+        document.removeEventListener('touchend', onEnd)
+      }
+      document.addEventListener('mousemove', onMove)
+      document.addEventListener('touchmove', onMove, { passive: false })
+      document.addEventListener('mouseup', onEnd)
+      document.addEventListener('touchend', onEnd)
+    }, [rotations, setItemRotation])
+
     const bringToFront = useCallback((id: string, artworkId: string) => {
+      setSelectedId(id)
       const maxZ = Math.max(...items.map(i => i.z_index || 1), 1)
       const newZ = maxZ + 1
       setItems(prev => prev.map(item => item.id === id ? { ...item, z_index: newZ } : item))
       updateMutation.mutate({ artworkId, payload: { z_index: newZ } })
     }, [items, updateMutation])
 
-    const handleTouchEnd = useCallback((id: string, index: number) => {
+    const handleTouchEnd = useCallback((id: string, artworkId: string) => {
       const now = Date.now()
       const last = lastTapRef.current[id] || 0
-      if (now - last < 300) { onArtworkClick(index); lastTapRef.current[id] = 0 }
+      if (now - last < 300) { onArtworkClick(artworkId); lastTapRef.current[id] = 0 }
       else lastTapRef.current[id] = now
     }, [onArtworkClick])
 
@@ -126,7 +184,7 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
         const rndEls = Array.from(canvasRef.current.children) as HTMLElement[]
         if (rndEls.length === 0) return
 
-        type ItemRect = { x: number; y: number; w: number; h: number; src: string; z: number }
+        type ItemRect = { x: number; y: number; w: number; h: number; src: string; z: number; rotation: number }
         const rects: ItemRect[] = []
 
         rndEls.forEach((el, i) => {
@@ -140,7 +198,7 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
           const w = el.offsetWidth || item.width || 300
           const h = el.offsetHeight || item.height || 300
           const src = `/images/${item.artwork.image_large || item.artwork.image_original}`
-          rects.push({ x, y, w, h, src, z: item.z_index || 1 })
+          rects.push({ x, y, w, h, src, z: item.z_index || 1, rotation: rotations[item.id] || 0 })
         })
 
         if (rects.length === 0) return
@@ -165,7 +223,21 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
           const img = new Image()
           img.crossOrigin = 'anonymous'
           img.onload = () => {
-            ctx.drawImage(img, rect.x - minX + PAD, rect.y - minY + PAD, rect.w, rect.h)
+            const iw = img.naturalWidth, ih = img.naturalHeight
+            // Replicate object-cover: scale to fill, crop center
+            const scale = Math.max(rect.w / iw, rect.h / ih)
+            const sx = Math.max(0, (iw - rect.w / scale) / 2)
+            const sy = Math.max(0, (ih - rect.h / scale) / 2)
+            const sw = Math.min(iw, rect.w / scale)
+            const sh = Math.min(ih, rect.h / scale)
+
+            const cx = rect.x - minX + PAD + rect.w / 2
+            const cy = rect.y - minY + PAD + rect.h / 2
+            ctx.save()
+            ctx.translate(cx, cy)
+            ctx.rotate(rect.rotation * Math.PI / 180)
+            ctx.drawImage(img, sx, sy, sw, sh, -rect.w / 2, -rect.h / 2, rect.w, rect.h)
+            ctx.restore()
             resolve()
           }
           img.onerror = () => resolve()
@@ -184,6 +256,12 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
         setIsExporting(false)
       }
     }, [items, isExporting, collection.name])
+
+    useEffect(() => {
+      const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelectedId(null) }
+      document.addEventListener('keydown', onKey)
+      return () => document.removeEventListener('keydown', onKey)
+    }, [])
 
     // Scroll-wheel zoom
     useEffect(() => {
@@ -222,6 +300,7 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
 
     const defaultW = isMobile ? 160 : 300
     const handleStyles = buildHandleStyles(isMobile ? HANDLE_SIZE_MOBILE : HANDLE_SIZE_DESKTOP)
+    const handleClasses = buildHandleClasses()
     const canvasSize = isMobile ? 1200 : 2000
 
     return (
@@ -241,11 +320,13 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
               ref={canvasRef}
               style={{ position: 'absolute', top: 0, left: 0, width: canvasSize, height: canvasSize, transformOrigin: '0 0', transform: `scale(${zoom})` }}
             >
-              {items.map((item, index) => {
+              {items.map((item) => {
                 if (!item.artwork) return null
                 const itemDefaultH = item.artwork.height && item.artwork.width
                   ? (item.artwork.height / item.artwork.width) * defaultW
                   : defaultW
+                const rotation = rotations[item.id] || 0
+                const isSelected = selectedId === item.id
 
                 return (
                   <Rnd
@@ -258,15 +339,34 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
                     onTouchStart={() => bringToFront(item.id, item.artwork_id)}
                     style={{ zIndex: item.z_index || 1 }}
                     bounds="parent"
-                    className="group"
+                    className={`group moodboard-item${isSelected ? ' is-selected' : ''}`}
                     resizeHandleStyles={handleStyles}
+                    resizeHandleClasses={handleClasses}
                     dragHandleClassName="drag-handle"
                   >
+                    {/* Rotation drag handle — appears above item when selected */}
+                    {isSelected && (
+                      <div
+                        className="absolute -top-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-0.5"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <div
+                          className="w-6 h-6 rounded-full bg-accent/80 border border-accent/40 flex items-center justify-center shadow cursor-grab active:cursor-grabbing touch-none"
+                          onMouseDown={e => startRotateDrag(e, item.id)}
+                          onTouchStart={e => startRotateDrag(e, item.id)}
+                          title="Arraste para girar"
+                        >
+                          <RotateCw size={12} className="text-primary-foreground pointer-events-none" />
+                        </div>
+                      </div>
+                    )}
+
                     <div
-                      className="drag-handle w-full h-full relative cursor-move shadow-sm hover:shadow-md transition-shadow bg-card"
-                      onDoubleClick={() => onArtworkClick(index)}
-                      onTouchEnd={() => handleTouchEnd(item.id, index)}
-                      style={{ touchAction: 'none' }}
+                      ref={el => { itemEls.current[item.id] = el }}
+                      className="drag-handle w-full h-full relative cursor-move shadow-sm hover:shadow-md transition-shadow"
+                      onDoubleClick={() => onArtworkClick(item.artwork_id)}
+                      onTouchEnd={() => handleTouchEnd(item.id, item.artwork_id)}
+                      style={{ transform: `rotate(${rotation}deg)`, transformOrigin: 'center center', touchAction: 'none' }}
                     >
                       <img
                         src={`/images/${item.artwork.image_large || item.artwork.image_original}`}
@@ -275,6 +375,34 @@ const Moodboard = forwardRef<MoodboardHandle, MoodboardProps>(
                         draggable={false}
                       />
                       <div className="absolute inset-0 border-2 border-transparent group-hover:border-accent/50 pointer-events-none transition-colors" />
+
+                      {/* Rotation buttons — bottom-right when selected */}
+                      {isSelected && (
+                        <div
+                          className="absolute bottom-1 right-1 z-30 flex items-center gap-0.5"
+                          onClick={e => e.stopPropagation()}
+                          onMouseDown={e => e.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            className="p-1 rounded bg-background/80 hover:bg-background text-foreground transition-colors"
+                            onClick={() => setItemRotation(item.id, rotation - 15)}
+                            title="-15°"
+                          ><RotateCcw size={11} /></button>
+                          <button
+                            type="button"
+                            className="px-1.5 py-1 rounded bg-background/80 hover:bg-background text-foreground text-[10px] font-mono transition-colors min-w-[2.5rem] text-center"
+                            onClick={() => setItemRotation(item.id, 0)}
+                            title="Resetar"
+                          >{Math.round(rotation)}°</button>
+                          <button
+                            type="button"
+                            className="p-1 rounded bg-background/80 hover:bg-background text-foreground transition-colors"
+                            onClick={() => setItemRotation(item.id, rotation + 15)}
+                            title="+15°"
+                          ><RotateCw size={11} /></button>
+                        </div>
+                      )}
                     </div>
                   </Rnd>
                 )

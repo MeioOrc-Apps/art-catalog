@@ -228,7 +228,10 @@ export default function CollectionDetailPage() {
             {viewMode === 'gallery' ? (
               <Gallery artworks={artworks} onArtworkClick={handleClick} />
             ) : (
-              <Moodboard ref={moodboardRef} collection={collection} onArtworkClick={(index) => setLightboxIndex(index)} />
+              <Moodboard ref={moodboardRef} collection={collection} onArtworkClick={(artworkId) => {
+                const idx = artworks.findIndex(a => a.id === artworkId)
+                if (idx >= 0) setLightboxIndex(idx)
+              }} />
             )}
           </>
         )}

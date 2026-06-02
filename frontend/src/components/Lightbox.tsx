@@ -135,17 +135,23 @@ export default function Lightbox({
     else navigate(-1)         // swipe right → previous
   }, [imgZoom, navigate])
 
-  // Double-tap to zoom 2× (or reset)
-  const lastTapRef = useRef<number>(0)
-  const handleImgTap = useCallback(() => {
-    const now = Date.now()
-    if (now - lastTapRef.current < 300) {
-      setImgZoom((prev) => (prev > 1 ? 1 : 2))
-      setImgOffset({ x: 0, y: 0 })
-      lastTapRef.current = 0
-    } else {
-      lastTapRef.current = now
-    }
+  // Mouse drag-to-pan when zoomed
+  const mousePanRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null)
+  const handleAreaMouseDown = useCallback((e: React.MouseEvent) => {
+    if (imgZoom <= 1) return
+    e.preventDefault()
+    mousePanRef.current = { x: e.clientX, y: e.clientY, ox: imgOffset.x, oy: imgOffset.y }
+  }, [imgZoom, imgOffset])
+  const handleAreaMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!mousePanRef.current) return
+    setImgOffset({ x: mousePanRef.current.ox + e.clientX - mousePanRef.current.x, y: mousePanRef.current.oy + e.clientY - mousePanRef.current.y })
+  }, [])
+  const handleAreaMouseUp = useCallback(() => { mousePanRef.current = null }, [])
+
+  // Double-tap to zoom 2× (or reset) — only fires on the image itself
+  const handleImgDoubleClick = useCallback(() => {
+    setImgZoom((prev) => (prev > 1 ? 1 : 2))
+    setImgOffset({ x: 0, y: 0 })
   }, [])
 
   if (!open || !artworks[index]) return null
@@ -219,7 +225,10 @@ export default function Lightbox({
           onTouchStart={handleImgTouchStart}
           onTouchMove={handleImgTouchMove}
           onTouchEnd={handleImgTouchEnd}
-          onClick={handleImgTap}
+          onMouseDown={handleAreaMouseDown}
+          onMouseMove={handleAreaMouseMove}
+          onMouseUp={handleAreaMouseUp}
+          onMouseLeave={handleAreaMouseUp}
           style={{ cursor: isZoomed ? 'grab' : 'default' }}
         >
           <img
@@ -233,6 +242,7 @@ export default function Lightbox({
               touchAction: 'none',
             }}
             draggable={false}
+            onDoubleClick={handleImgDoubleClick}
             onClick={(e) => e.stopPropagation()}
           />
           {isZoomed && (
