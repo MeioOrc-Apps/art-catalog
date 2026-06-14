@@ -151,7 +151,7 @@ O Art Catalog foi desenhado para rodar perfeitamente no seu servidor doméstico 
 A infraestrutura utiliza o GitHub Actions para gerar imagens Docker automaticamente. Existem duas formas de gerenciar as atualizações no seu servidor:
 
 - **Atualizações Contínuas (Padrão):** O arquivo `docker-compose.zimaos.yml` aponta para a tag `:latest`. Toda vez que um novo código é enviado para a branch `main`, o GitHub gera uma nova imagem `:latest`. O ZimaOS detectará a mudança e exibirá um aviso de "Update" no painel.
-- **Versões Estáveis (Rollbacks/Fixas):** Sempre que um ciclo de desenvolvimento é fechado, uma tag de versão é criada (ex: `v0.1.0`). O GitHub gera uma imagem fixa para essa versão. Se você deseja estabilidade total ou precisa reverter uma atualização, vá nas configurações do aplicativo no ZimaOS e altere a tag da imagem de `:latest` para a versão desejada (ex: `ghcr.io/sergiosjs/art-catalog-api:0.1.0`).
+- **Versões Estáveis (Rollbacks/Fixas):** Sempre que um ciclo de desenvolvimento é fechado, uma tag de versão é criada (ex: `v0.1.0`). O GitHub gera uma imagem fixa para essa versão. Se você deseja estabilidade total ou precisa reverter uma atualização, vá nas configurações do aplicativo no ZimaOS e altere a tag da imagem de `:latest` para a versão desejada (ex: `sergiosjs/art-catalog-api:1.1.0`).
 
 **Como gerar uma nova versão (Para desenvolvedores):**
 
